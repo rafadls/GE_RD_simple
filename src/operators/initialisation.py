@@ -3,6 +3,7 @@ from os import getcwd, listdir, path
 from random import randint, shuffle
 
 from algorithm.parameters import params
+from utilities.stats.trackers import cache
 from representation import individual
 from representation.derivation import generate_tree, pi_grow
 from representation.individual import Individual
@@ -11,6 +12,8 @@ from representation.tree import Tree
 from scripts import GE_LR_parser
 from utilities.representation.python_filter import python_filter
 
+from fitness.evaluation import evaluate_fitness
+from fitness.funciones_fitness import *
 
 def initialisation(size):
     """
@@ -47,7 +50,7 @@ def sample_genome():
     return genome
 
 
-def uniform_genome(size):
+def uniform_genome_original(size):
     """
     Create a population of individuals by sampling genomes uniformly.
 
@@ -57,6 +60,28 @@ def uniform_genome(size):
 
     return [individual.Individual(sample_genome(), None) for _ in range(size)]
 
+
+def uniformgenome(size):
+    print()
+    print("size: " + str(size))
+    inds_to_return = []
+    for i in range(size):
+        genome = sample_genome()
+        ind = individual.Individual(genome, None)
+        ind = evaluate_fitness([ind])[0]
+        check = check_correlation(ind)
+        while (not check) or np.isnan(ind.fitness) or np.isinf(ind.fitness) or (ind.phenotype in cache.keys()):
+            genome = sample_genome()
+            ind = individual.Individual(genome, None)    
+            ind = evaluate_fitness([ind])[0]
+            check = check_correlation(ind)
+        cache[ind.phenotype] = ind.fitness
+        inds_to_return.append(ind)
+        print('individuo creado')
+        print('depth: ' + str(ind.depth))
+    print("size: " + str(len(inds_to_return)))
+    print()
+    return inds_to_return
 
 def uniform_tree(size):
     """

@@ -5,7 +5,7 @@ from stats.stats import stats
 from utilities.stats.trackers import cache, runtime_error_cache
 
 
-def evaluate_fitness(individuals):
+def evaluate_fitness(individuals,optimization=False):
     """
     Evaluate an entire population of individuals. Invalid individuals are given
     a default bad fitness. If params['CACHE'] is specified then individuals
@@ -73,7 +73,7 @@ def evaluate_fitness(individuals):
                     ind.name = name
 
             if eval_ind:
-                results = eval_or_append(ind, results, pool)
+                results = eval_or_append(ind, results, pool, optimization)
 
     if params['MULTICORE']:
         for result in results:
@@ -94,7 +94,7 @@ def evaluate_fitness(individuals):
     return individuals
 
 
-def eval_or_append(ind, results, pool):
+def eval_or_append(ind, results, pool,optimization=False):
     """
     Evaluates an individual if sequential evaluation is being used. If
     multi-core parallel evaluation is being used, adds the individual to the
@@ -115,7 +115,7 @@ def eval_or_append(ind, results, pool):
 
     else:
         # Evaluate the individual.
-        ind.evaluate()
+        ind.evaluate(optimization)
 
         # Check if individual had a runtime error.
         if ind.runtime_error:

@@ -6,6 +6,8 @@ from operators.initialisation import initialisation
 from stats.stats import get_stats, stats
 from utilities.algorithm.initialise_run import pool_init
 from utilities.stats import trackers
+from utilities.stats.trackers import cache
+from utilities.stats.stats_in_excel import saveGenerationAsExcel
 
 
 def search_loop():
@@ -30,13 +32,18 @@ def search_loop():
 
     # Generate statistics for run so far
     get_stats(individuals)
+    saveGenerationAsExcel(individuals, params['FILE_PATH'], "poblacionInicial.xls")
 
     # Traditional GE
     for generation in range(1, (params['GENERATIONS'] + 1)):
         stats['gen'] = generation
 
         # New generation
-        individuals = params['STEP'](individuals)
+        if generation%params["optimizeConstant_each"] == 0:
+            individuals = params['STEP'](individuals, optimization=True)
+        else:
+            individuals = params['STEP'](individuals)
+        saveGenerationAsExcel(individuals, params['FILE_PATH'], "generation_"+str(generation)+".xls")
 
     if params['MULTICORE']:
         # Close the workers pool (otherwise they'll live on forever).

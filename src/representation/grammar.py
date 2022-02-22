@@ -1,7 +1,7 @@
+import numpy as np
 from math import floor
-from re import DOTALL, MULTILINE, finditer, match
+from re import match, finditer, DOTALL, MULTILINE
 from sys import maxsize
-
 from algorithm.parameters import params
 
 
@@ -45,13 +45,16 @@ class Grammar(object):
 
         # Read in BNF grammar, set production rules, terminals and
         # non-terminals.
+
         self.read_bnf_file(file_name)
 
         # Check the minimum depths of all non-terminals in the grammar.
         self.check_depths()
 
         # Check which non-terminals are recursive.
-        self.check_recursion(self.start_rule["symbol"], [])
+        # TODO: hacer algo con el check recursion
+        #print("en src/representation/grammar.py borre el check_recursion")
+        #self.check_recursion(self.start_rule["symbol"], [])
 
         # Set the minimum path and maximum arity of the grammar.
         self.set_arity()
@@ -90,14 +93,13 @@ class Grammar(object):
         :param file_name: A specified BNF grammar file.
         :return: Nothing.
         """
-
         with open(file_name, 'r') as bnf:
             # Read the whole grammar file.
             content = bnf.read()
 
             for rule in finditer(self.ruleregex, content, DOTALL):
                 # Find all rules in the grammar
-
+                #print(rule)
                 if self.start_rule is None:
                     # Set the first rule found as the start rule.
                     self.start_rule = {"symbol": rule.group('rulename'),
@@ -128,6 +130,112 @@ class Grammar(object):
 
                     # Initialise empty data structures for production choice
                     tmp_production, terminalparts = [], None
+
+                    GE_constants_regex = r'GE_constants:(?P<init_val>-*\d+.\d+|-*\d+)_(?P<step_val>-*\d+.\d+|-*\d+)_(?P<last_val>-*\d+.\d+|-*\d+)'
+                    matching = match(GE_constants_regex, p.group('production'))
+                    #print(p.group('production'))
+                    if matching:
+                        #print(p.group('production'))
+                        accuracy = 1
+                        if len(matching.group('init_val').split("."))>1:
+                            if len(matching.group('init_val').split(".")[-1].rstrip("0")) > accuracy:
+                                accuracy = len(matching.group('init_val').split(".")[-1])
+                        if len(matching.group('step_val').split("."))>1:
+                            if len(matching.group('step_val').split(".")[-1].rstrip("0")) > accuracy:
+                                accuracy = len(matching.group('step_val').split(".")[-1])
+                        if len(matching.group('last_val').split("."))>1:
+                            if len(matching.group('last_val').split(".")[-1].rstrip("0")) > accuracy:
+                                accuracy = len(matching.group('last_val').split(".")[-1])
+                        try:
+                            init_value = round(float(matching.group('init_val')), accuracy)
+                            step_value = round(float(matching.group('step_val')), accuracy)
+                            last_value = round(float(matching.group('last_val')), accuracy)
+                        except (ValueError, AttributeError):
+                            raise ValueError("Bad use of GE_constants: "
+                                             + matching.group())
+                        
+                        #print(float(matching.group('init_val')),float(matching.group('step_val')),float(matching.group('last_val')))
+                        #print(init_value, last_value+step_value, step_value)
+
+                        possible_values = [round(x, accuracy) for x in np.arange(init_value, last_value+step_value, step_value)]
+                        if possible_values[-1]>last_value:
+                        	possible_values = possible_values[0:-1]
+                        params[str(init_value) +"_"+ str(step_value) +"_"+ str(last_value)] = possible_values
+                        #print(possible_values)
+                        #print(accuracy)
+                        #new_param = file_name.split("/")[-1].split(".")[0]+"_dict"
+                        #new_param2 = file_name.split("/")[-1].split(".")[0]+"_max_constant"
+                        #params[new_param2] = max_constant
+                        #params[new_param] = {}
+                        #params[str(rule.group('rulename'))+"_upperBound"] = max_constant
+                        counter = 0
+                        #tmp_productions_to_extend = [0]*len(possible_values)
+                        for i in possible_values:
+                            # add a terminal symbol
+                            i = round(i,accuracy)
+                            i = str(accuracy) +"_"+ str(init_value) +"_"+ str(step_value) +"_"+ str(last_value) +"_"+ str(i)
+                            #params[new_param][str(i)] = counter
+                            counter += 1
+                            tmp_production, terminalparts = [], None
+                            symbol = {
+                                "symbol": str(i),
+                                "type": "T",
+                                "min_steps": 0,
+                                "recursive": False}
+                            tmp_production.append(symbol)
+                            if str(i) not in self.terminals:
+                                self.terminals[str(i)] = [rule.group('rulename')]
+                            elif rule.group('rulename') not in self.terminals[str(i)]:
+                                self.terminals[str(i)].append(rule.group('rulename'))
+                            tmp_productions.append({"choice": tmp_production,
+                                                    "recursive": False,
+                                                    "NT_kids": False})
+                        if len(possible_values) > params['CODON_SIZE']:
+                            params['CODON_SIZE'] = len(possible_values)
+                        
+                        continue
+                    """
+                    GE_constants_regex = r'GE_constants:(?P<range>\w*)'
+                    matching = match(GE_constants_regex, p.group('production'))
+                    if matching:
+                        try:
+                            max_constant = int(matching.group('range'))
+                        except (ValueError, AttributeError):
+                            raise ValueError("Bad use of GE_constants: "
+                                             + matching.group())
+                        possible_values = np.arange(0, max_constant+0.0001, 0.0001)
+                        #new_param = file_name.split("/")[-1].split(".")[0]+"_dict"
+                        #new_param2 = file_name.split("/")[-1].split(".")[0]+"_max_constant"
+                        #params[new_param2] = max_constant
+                        #params[new_param] = {}
+                        params[str(rule.group('rulename'))+"_upperBound"] = max_constant
+                        counter = 0
+                        tmp_productions_to_extend = [0]*len(possible_values)
+                        for i in possible_values:
+                            # add a terminal symbol
+                            i = round(i,4)
+                            i = str(max_constant) +"_"+ str(i)
+                            #params[new_param][str(i)] = counter
+                            counter += 1
+                            tmp_production, terminalparts = [], None
+                            symbol = {
+                                "symbol": str(i),
+                                "type": "T",
+                                "min_steps": 0,
+                                "recursive": False}
+                            tmp_production.append(symbol)
+                            if str(i) not in self.terminals:
+                                self.terminals[str(i)] = [rule.group('rulename')]
+                            elif rule.group('rulename') not in self.terminals[str(i)]:
+                                self.terminals[str(i)].append(rule.group('rulename'))
+                            tmp_productions.append({"choice": tmp_production,
+                                                    "recursive": False,
+                                                    "NT_kids": False})
+                        if len(possible_values) > params['CODON_SIZE']:
+                            params['CODON_SIZE'] = len(possible_values)
+                        
+                        continue
+                    """
 
                     # special cases: GE_RANGE:dataset_n_vars will be
                     # transformed to productions 0 | 1 | ... |
@@ -167,7 +275,7 @@ class Grammar(object):
                                 self.terminals[str(i)] = \
                                     [rule.group('rulename')]
                             elif rule.group('rulename') not in \
-                                    self.terminals[str(i)]:
+                                self.terminals[str(i)]:
                                 self.terminals[str(i)].append(
                                     rule.group('rulename'))
                             tmp_productions.append({"choice": tmp_production,
@@ -195,7 +303,7 @@ class Grammar(object):
                                     self.terminals[terminalparts] = \
                                         [rule.group('rulename')]
                                 elif rule.group('rulename') not in \
-                                        self.terminals[terminalparts]:
+                                    self.terminals[terminalparts]:
                                     self.terminals[terminalparts].append(
                                         rule.group('rulename'))
                                 terminalparts = None
@@ -224,7 +332,7 @@ class Grammar(object):
                             self.terminals[terminalparts] = \
                                 [rule.group('rulename')]
                         elif rule.group('rulename') not in \
-                                self.terminals[terminalparts]:
+                            self.terminals[terminalparts]:
                             self.terminals[terminalparts].append(
                                 rule.group('rulename'))
                     tmp_productions.append({"choice": tmp_production,
@@ -240,9 +348,11 @@ class Grammar(object):
 
                     if len(tmp_productions) == 1:
                         # Unit productions.
-                        print("Warning: Grammar contains unit production "
-                              "for production rule", rule.group('rulename'))
-                        print("         Unit productions consume GE codons.")
+                        #TODO: borre el warning
+                        pass
+                        #print("Warning: Grammar contains unit production "
+                        #      "for production rule", rule.group('rulename'))
+                        #print("         Unit productions consume GE codons.")
                 else:
                     # Conflicting rules with the same name.
                     raise ValueError("lhs should be unique",
@@ -261,7 +371,6 @@ class Grammar(object):
         # Initialise graph and counter for checking minimum steps to Ts for
         # each NT.
         counter, graph = 1, []
-
         for rule in sorted(self.rules.keys()):
             # Iterate over all NTs.
             choices = self.rules[rule]['choices']
@@ -273,7 +382,6 @@ class Grammar(object):
             for choice in choices:
                 # Add a new edge to our graph list.
                 graph.append([rule, choice['choice']])
-
         while graph:
             removeset = set()
             for edge in graph:
@@ -283,7 +391,6 @@ class Grammar(object):
                         self.non_terminals[sy["symbol"]]['expanded']
                         for sy in edge[1]]):
                     removeset.add(edge[0])
-
             for s in removeset:
                 # These NTs are now expanded and have their correct minimum
                 # path set.
@@ -302,11 +409,13 @@ class Grammar(object):
         :param seen: Contains already checked symbols in the current traversal.
         :return: Boolean stating whether or not cur_symbol is recursive.
         """
-
+        print("empezando check recursion")
+        print(cur_symbol)
+        print(self.non_terminals.keys())
         if cur_symbol not in self.non_terminals.keys():
             # Current symbol is a T.
             return False
-
+        print("terminando check recursion")
         if cur_symbol in seen:
             # Current symbol has already been seen, is recursive.
             return True
@@ -387,11 +496,11 @@ class Grammar(object):
             for choice in choices:
                 # Set the maximum path to a terminal for each produciton choice
                 choice['max_path'] = max([item["min_steps"] for item in
-                                          choice['choice']])
+                                      choice['choice']])
 
             # Find shortest path to a terminal for all production choices for
             # the current NT. The shortest path will be the minimum of the
-            # maximum paths to a T for each choice over all choices.
+            # maximum paths to a T for each choice over all chocies.
             min_path = min([choice['max_path'] for choice in choices])
 
             # Set the minimum path in the self.non_terminals dict.
@@ -498,14 +607,14 @@ class Grammar(object):
                         # Iterate over all symbols in a production choice.
                         symbol_arity_pos = 0
 
-                        if j["type"] == "NT":
+                        if j["type"] is "NT":
                             # We are only interested in non-terminal symbols
                             for child in self.rules[j["symbol"]]['choices']:
                                 # Iterate over all production choices for
                                 # each NT symbol in the original choice.
 
                                 if len(child['choice']) == 1 and \
-                                        child['choice'][0]["type"] == "T":
+                                   child['choice'][0]["type"] == "T":
                                     # If the child choice leads directly to
                                     # a single terminal, increment the
                                     # permutation count.
@@ -517,13 +626,9 @@ class Grammar(object):
                                     # Generate a key for the permutations
                                     # dictionary and increment the
                                     # permutations count there.
-                                    key = [sym['symbol'] for sym in
-                                           child['choice']]
-                                    if (i - 1) in depth_per_symbol_trees[
-                                        str(key)].keys():
-                                        symbol_arity_pos += \
-                                            depth_per_symbol_trees[str(key)][
-                                                i - 1]
+                                    key = [sym['symbol'] for sym in child['choice']]
+                                    if (i - 1) in depth_per_symbol_trees[str(key)].keys():
+                                        symbol_arity_pos += depth_per_symbol_trees[str(key)][i - 1]
 
                             # Multiply original count by new count.
                             sym_pos *= symbol_arity_pos
@@ -537,10 +642,7 @@ class Grammar(object):
             for sy in start_symbols:
                 key = [sym['symbol'] for sym in sy['choice']]
                 if str(key) in depth_per_symbol_trees:
-                    pos += depth_per_symbol_trees[str(key)][depth] if depth in \
-                                                                      depth_per_symbol_trees[
-                                                                          str(
-                                                                              key)] else 0
+                    pos += depth_per_symbol_trees[str(key)][depth] if depth in depth_per_symbol_trees[str(key)] else 0
                 else:
                     pos += 1
 

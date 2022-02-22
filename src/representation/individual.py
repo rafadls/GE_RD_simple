@@ -112,10 +112,9 @@ class Individual(object):
         new_ind.depth, new_ind.nodes = self.depth, self.nodes
         new_ind.used_codons = self.used_codons
         new_ind.runtime_error = self.runtime_error
-
         return new_ind
 
-    def evaluate(self):
+    def evaluate(self,optimization=False):
         """
         Evaluates phenotype in using the fitness function set in the params
         dictionary. For regression/classification problems, allows for
@@ -127,7 +126,7 @@ class Individual(object):
         """
 
         # Evaluate fitness using specified fitness function.
-        self.fitness = params['FITNESS_FUNCTION'](self)
+        self.fitness = params['FITNESS_FUNCTION'](self,optimization=optimization)
 
         if params['MULTICORE']:
             return self

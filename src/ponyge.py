@@ -14,18 +14,22 @@ check_python_version()
 from stats.stats import get_stats
 from algorithm.parameters import params, set_params
 import sys
+import time
+
+from utilities.stats.stats_in_excel import saveGenerationAsExcel
 
 
 def mane():
     """ Run program """
     set_params(sys.argv[1:])  # exclude the ponyge.py arg itself
-
     # Run evolution
     individuals = params['SEARCH_LOOP']()
 
     # Print final review
     get_stats(individuals, end=True)
+    saveGenerationAsExcel(individuals, params['FILE_PATH'], "poblacion_final.xls")
 
 
 if __name__ == "__main__":
+    params["start-time"] = time.time()
     mane()

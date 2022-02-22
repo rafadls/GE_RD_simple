@@ -1,5 +1,5 @@
 from collections import deque
-
+from re import match
 import numpy as np
 from algorithm.parameters import params
 from representation.tree import Tree
@@ -66,7 +66,7 @@ def mapper(genome, tree):
     return phenotype, genome, tree, nodes, invalid, depth, used_codons
 
 
-def map_ind_from_genome(genome):
+def map_ind_from_genome(genome,return_consts_location=False):
     """
     A fast genotype to phenotype mapping process. Map input via rules to
     output. Does not require the recursive tree class, but still calculates
@@ -98,7 +98,8 @@ def map_ind_from_genome(genome):
 
     # Initialise the list of unexpanded non-terminals with the start rule.
     unexpanded_symbols = deque([(bnf_grammar.start_rule, 1)])
-
+    count = 0
+    consts_loc = []
     while (wraps < max_wraps) and unexpanded_symbols:
         # While there are unexpanded non-terminals, and we are below our
         # wrapping limit, we can continue to map the genome.
@@ -127,6 +128,9 @@ def map_ind_from_genome(genome):
         if current_symbol["type"] != "NT":
             output.append(current_symbol["symbol"])
 
+            cte_regex = r"(-\d+|-\d+.\d+|\d+|\d+.\d+)_(-\d+|-\d+.\d+|\d+|\d+.\d+)_(-\d+|-\d+.\d+|\d+|\d+.\d+)_(-\d+|-\d+.\d+|\d+|\d+.\d+)_(-\d+|-\d+.\d+|\d+|\d+.\d+)"
+            if match(cte_regex, current_symbol["symbol"]):
+                consts_loc.append(count-1)
         else:
             # Current item is a new non-terminal. Find associated production
             # choices.
@@ -163,6 +167,11 @@ def map_ind_from_genome(genome):
                 nodes += nt_count
             else:
                 nodes += 1
+            count +=1
+
+    # Generate phenotype string.
+    if return_consts_location:
+        return consts_loc
 
     # Generate phenotype string.
     output = "".join(output)
@@ -172,6 +181,133 @@ def map_ind_from_genome(genome):
         # solution.
         return None, genome, None, nodes, True, max_depth, used_input
 
+    return output, genome, None, nodes, False, max_depth, used_input
+
+
+def map_ind_from_genome_new(genome, return_consts_location=False):
+    """
+    A fast genotype to phenotype mapping process. Map input via rules to
+    output. Does not require the recursive tree class, but still calculates
+    tree information, e.g. number of nodes and maximum depth.
+
+    :param genome: A genome to be mapped.
+    :return: Output in the form of a phenotype string ('None' if invalid),
+             Genome,
+             None (this is reserved for the derivation tree),
+             The number of nodes in the derivation,
+             A boolean flag for whether or not the individual is invalid,
+             The maximum depth of any node in the tree, and
+             The number of used codons.
+    """
+
+    # Create local variables to avoide multiple dictionary lookups
+    max_tree_depth, max_wraps = params['MAX_TREE_DEPTH'], params['MAX_WRAPS']
+    d = {} #diccionario de las variables locales
+  
+    d["bnf_grammar"] = params['BNF_GRAMMAR']
+    d["genome"] = genome
+    d["n_input"] = len(genome)
+    d["used_input"] = 0
+    d["current_depth"] = 1
+    d["max_depth"] = 1
+    d["nodes"] = 1
+    d["wraps"] = -1
+    d["consts_loc"] = []
+    d["output"] = deque()
+    d["unexpanded_symbols"] = deque([(d["bnf_grammar"].start_rule,1)])
+    d["counting_genome"] = 0
+
+    while (d["wraps"] < max_wraps) and d["unexpanded_symbols"]:
+        # While there are unexpanded non-terminals, and we are below our
+        # wrapping limit, we can continue to map the genome.
+
+        if max_tree_depth and (d["max_depth"] > max_tree_depth):
+            # We have breached our maximum tree depth limit.
+            break
+
+        if d["used_input"] % d["n_input"] == 0 and \
+                        d["used_input"] > 0 and \
+                any([j[0]["type"] == "NT" for j in d["unexpanded_symbols"]]):
+            # If we have reached the end of the genome and unexpanded
+            # non-terminals remain, then we need to wrap back to the start
+            # of the genome again. Can break the while loop.
+            d["wraps"] += 1
+
+        # Expand a production from the list of unexpanded non-terminals.
+        d["current_item"] = d["unexpanded_symbols"].popleft()
+        d["current_symbol"], d["current_depth"] = d["current_item"][0], d["current_item"][1]
+        if d["max_depth"] < d["current_depth"]:
+            # Set the new maximum depth.
+            d["max_depth"] = d["current_depth"]
+        # print(d["current_symbol"+i2])
+        # Set output if it is a terminal.
+        if d["current_symbol"]["type"] != "NT":
+
+            cte_regex = r"(\d+|\d+.\d+)_(\d+|\d+.\d+)_(\d+|\d+.\d+)_(\d+|\d+.\d+)_(\d+|\d+.\d+)"
+            if match(cte_regex, d["current_symbol"]["symbol"]):
+                d["consts_loc"].append(d["counting_genome"]-1)
+            #print(d["current_symbol"+i2]["symbol"], match(cte_regex, d["current_symbol"+i2]["symbol"]))
+            """s
+            try:
+                consts = float(d["current_symbol"+i2]["symbol"])
+                d["consts_loc_"+i2].append(d["counting_genome_"+i2])
+            except:
+                pass
+            """
+            d["output"].append(d["current_symbol"]["symbol"])
+
+        else:
+            # Current item is a new non-terminal. Find associated production
+            # choices.
+            d["production_choices"] = d["bnf_grammar"].rules[d["current_symbol"][
+                "symbol"]]["choices"]
+            d["no_choices"] = d["bnf_grammar"].rules[d["current_symbol"]["symbol"]][
+                "no_choices"]
+
+            # Select a production based on the next available codon in the
+            # genome.
+            d["current_production"] = d["genome"][d["used_input"] % d["n_input"]] % d["no_choices"]
+
+            # Use an input
+            d["used_input"] += 1
+
+            # Initialise children as empty deque list.
+            d["children"] = deque()
+            d["nt_count"] = 0
+
+            for prod in d["production_choices"][d["current_production"]]['choice']:
+                # iterate over all elements of chosen production rule.
+
+                d["child"] = [prod, d["current_depth"] + 1]
+
+                # Extendleft reverses the order, thus reverse adding.
+                d["children"].appendleft(d["child"])
+                if d["child"][0]["type"] == "NT":
+                    d["nt_count"] += 1
+
+            # Add the new children to the list of unexpanded symbols.
+            d["unexpanded_symbols"].extendleft(d["children"])
+
+            if d["nt_count"] > 0:
+                d["nodes"] += d["nt_count"]
+            else:
+                d["nodes"] += 1
+            d["counting_genome"] += 1
+
+    # Generate phenotype string.
+    if return_consts_location:
+        return d["consts_loc"]
+
+    d["output"] = "".join(d["output"])
+    output = d["output"]
+    nodes = d["nodes"]
+    max_depth = d["max_depth"]
+    used_input = d["used_input"]
+   
+    output = output[:-1]
+    if len(d["unexpanded_symbols"]) > 0:
+        print("No se pudo mapear el individuo")
+        return None, genome, None, nodes, True, max_depth, used_input
     return output, genome, None, nodes, False, max_depth, used_input
 
 

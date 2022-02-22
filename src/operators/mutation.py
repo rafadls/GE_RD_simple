@@ -1,13 +1,19 @@
 from random import choice, randint, random
 
 from algorithm.parameters import params
+from utilities.stats.trackers import cache
 from representation import individual
 from representation.derivation import generate_tree
 from representation.latent_tree import latent_tree_mutate, latent_tree_repair
 from utilities.representation.check_methods import check_ind
+from fitness.funciones_fitness import *
 
+from fitness.evaluation import evaluate_fitness
+import numpy as np
 
 def mutation(pop):
+    print()
+    print('MUTATION')
     """
     Perform mutation on a population of individuals. Calls mutation operator as
     specified in params dictionary.
@@ -25,10 +31,16 @@ def mutation(pop):
         # If individual has no genome, default to subtree mutation.
         if not ind.genome and params['NO_MUTATION_INVALIDS']:
             new_ind = subtree(ind)
-
         else:
             # Perform mutation.
+            print()
+            print('antes mutación')
+            print('fenotipo: ' + ind.phenotype)
+            print('genotipo: ' + str(len(ind.genome)))
             new_ind = params['MUTATION'](ind)
+            print('después mutación')
+            print('fenotipo: ' + new_ind.phenotype)
+            print('genotipo: ' + str(len(new_ind.genome)))
 
         # Check ind does not violate specified limits.
         check = check_ind(new_ind, "mutation")
@@ -66,6 +78,7 @@ def int_flip_per_codon(ind):
 
     # Set effective genome length over which mutation will be performed.
     eff_length = get_effective_length(ind)
+    print('eff_length: ' + str(eff_length))
 
     if not eff_length:
         # Linear mutation cannot be performed on this individual.
@@ -82,12 +95,25 @@ def int_flip_per_codon(ind):
     # genome as defined by the within_used flag.
     for i in range(eff_length):
         if random() < p_mut:
-            ind.genome[i] = randint(0, params['CODON_SIZE'])
-
-    # Re-build a new individual with the newly mutated genetic information.
+            if params["MR"]:
+                intentos_de_mutacion = 0
+                while intentos_de_mutacion<params['mutation_trys']:
+                    base_genome = ind.genome
+                    base_genome[i] = randint(0, params['CODON_SIZE'])
+                    new_ind_test = individual.Individual(base_genome, None)
+                    new_ind_test.evaluate()
+                    check = check_correlation(new_ind_test)
+                    if (not check) or np.isnan(new_ind_test.fitness) or np.isinf(new_ind_test.fitness) or (new_ind_test.phenotype in cache.keys()):
+                        intentos_de_mutacion += 1
+                    else:
+                        ind.genome = base_genome
+                        break
+            else:
+                ind.genome[i] = randint(0, params['CODON_SIZE'])
     new_ind = individual.Individual(ind.genome, None)
-
+    cache[new_ind.phenotype] = new_ind.fitness
     return new_ind
+        
 
 
 def int_flip_per_ind(ind):

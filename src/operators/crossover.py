@@ -1,13 +1,20 @@
 from random import choice, randint, random, sample
 
 from algorithm.parameters import params
+from utilities.stats.trackers import cache
+
 from representation import individual
 from representation.latent_tree import latent_tree_crossover, \
     latent_tree_repair
 from utilities.representation.check_methods import check_ind
 
+from fitness.evaluation import evaluate_fitness
+import numpy as np
+from fitness.funciones_fitness import *
 
 def crossover(parents):
+    print()
+    print('CROSSOVER')
     """
     Perform crossover on a population of individuals. The size of the crossover
     population is defined as params['GENERATION_SIZE'] rather than params[
@@ -35,9 +42,21 @@ def crossover(parents):
             pass
 
         else:
-
             # Extend the new population.
-            cross_pop.extend(inds_out)
+            inds_out = evaluate_fitness(inds_out)
+            if params["MR"]:
+                for ind in inds_out:
+                    check = check_correlation(ind)
+                    if check and (not np.isnan(ind.fitness)) and (not np.isinf(ind.fitness)) and (not ind.phenotype in cache.keys()):
+                        print('Se agrega individuo: ' + ind.phenotype)
+                        cache[ind.phenotype] = ind.fitness
+                        cross_pop.append(ind)
+            else:
+                for ind in inds_out:
+                    if (not np.isnan(ind.fitness)) and (not np.isinf(ind.fitness)):
+                        cache[ind.phenotype] = ind.fitness
+                        print('Se agrega individuo: ' + ind.phenotype)
+                        cross_pop.append(ind)
 
     return cross_pop
 

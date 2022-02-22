@@ -6,7 +6,7 @@ from operators.selection import selection
 from stats.stats import get_stats
 
 
-def step(individuals):
+def step(individuals,optimization=False):
     """
     Runs a single generation of the evolutionary algorithm process:
         Selection
@@ -29,7 +29,7 @@ def step(individuals):
     new_pop = mutation(cross_pop)
 
     # Evaluate the fitness of the new population.
-    new_pop = evaluate_fitness(new_pop)
+    new_pop = evaluate_fitness(new_pop,optimization)
 
     # Replace the old population with the new population.
     individuals = replacement(new_pop, individuals)

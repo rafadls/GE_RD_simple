@@ -12,8 +12,8 @@ params = {
     'STEP': 'step',
 
     # Evolutionary Parameters
-    'POPULATION_SIZE': 500,
-    'GENERATIONS': 50,
+    'POPULATION_SIZE': 100,
+    'GENERATIONS': 100,
     'HILL_CLIMBING_HISTORY': 1000,
     'SCHC_COUNT_METHOD': "count_all",
 
@@ -24,15 +24,23 @@ params = {
     'RUNS': 1,
 
     # Class of problem
-    'FITNESS_FUNCTION': "supervised_learning.regression",
+    'FITNESS_FUNCTION': "fitness_modelo",
 
+    # Optimización
+    'smartConstant': True,
+
+    'optimizeConstant_each':50,
+    'MR': False,
+    "Correlation": False,
     # Select problem dataset
-    'DATASET_TRAIN': "Vladislavleva4/Train.txt",
+
+    'COEFICIENTE': 3, # 1: cdrag, 2: ff, 3: nusselt
+    
     'DATASET_TEST': None,
     'DATASET_DELIMITER': None,
 
     # Set grammar file
-    'GRAMMAR_FILE': "supervised_learning/Vladislavleva4.bnf",
+
 
     # Set the number of depths permutations are calculated for
     # (starting from the minimum path of the grammar).
@@ -58,7 +66,7 @@ params = {
 
     # INITIALISATION
     # Set initialisation operator.
-    'INITIALISATION': "operators.initialisation.PI_grow",
+    'INITIALISATION': "operators.initialisation.uniformgenome",
     # Set the maximum genome length for initialisation.
     'INIT_GENOME_LENGTH': 200,
     # Set the maximum tree depth for initialisation.
@@ -94,11 +102,12 @@ params = {
     'MUTATION': "operators.mutation.int_flip_per_codon",
     # Set mutation probability (None defaults to 1 over the length of
     # the genome for each codon)
-    'MUTATION_PROBABILITY': None,
+    'MUTATION_PROBABILITY': 0.05,
     # Set number of mutation events
     'MUTATION_EVENTS': 1,
     # Prevents mutation from generating invalids.
     'NO_MUTATION_INVALIDS': False,
+    'mutation_trys':10,
 
     # REPLACEMENT
     # Set replacement operator.
@@ -308,6 +317,20 @@ def set_params(command_line_args, create_files=True):
                 "and 'MUTATION_EVENTS' have been explicitly set.\n" \
                 "Only one of these parameters can be used at a time."
             raise Exception(s)
+
+
+        if params['COEFICIENTE'] == 1:
+            print("Entrenar: coeficiente de arrastre")
+            params['DATASET_TRAIN'] = "../datasets/ModeloBaterias/df_cdrag.txt"
+            params['GRAMMAR_FILE'] = "../grammars/ModeloBaterias/cdrag.bnf"
+        elif params['COEFICIENTE'] == 2:
+            print("Entrenar: factor de dricción")
+            params['DATASET_TRAIN'] = "../datasets/ModeloBaterias/df_ff.txt"
+            params['GRAMMAR_FILE'] = "../grammars/ModeloBaterias/friccion.bnf"
+        elif params['COEFICIENTE'] == 3:
+            print("Entrenar: número de Nusselt")
+            params['DATASET_TRAIN'] = "../datasets/ModeloBaterias/df_n.txt"
+            params['GRAMMAR_FILE'] = "../grammars/ModeloBaterias/nusselt_max2_index.bnf"
 
         # Initialise run lists and folders before we set imports.r
         initialise_run_params(create_files)

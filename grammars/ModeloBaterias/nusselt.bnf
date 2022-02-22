@@ -1,0 +1,47 @@
+<start>     ::= (<C>)*(Rem^(<m>))*(Prandtl^(<n>))
+
+<C>         ::= <factorS><&1> |<factorS><&1> |<factorS><&1> |<factorS><&1> |c[<-5,5>]<factorSS>   
+
+<m>         ::= <factorS><&1> |<factorS><&1> |<factorS><&1> |<factorS><&1> |c[<-5,5>]<factorSS>
+
+<n>         ::= <factorS><&1> |<factorS><&1> |<factorS><&1> |<factorS><&1> |c[<-5,5>]<factorSS>
+
+
+<factorSS>  ::= <fS><fS><fS><fS>
+<factorS>   ::= ((<factor> + 0<fS>)     / (1<fS><fS>))              |
+                ((<factor> + <factor>)  / (1<fS><fS>))              |
+                ((<factor> + 0<fS>)     / (<factor> + <factor>))    |
+                ((<factor> + <factor>)  / (<factor> + 0<fS>))       |
+                ((<factor> + <factor>)  / (<factor> + <factor>))    
+
+
+<fS>        ::= <f><f>
+<factor>    ::= (<factor0>) <f> |
+                (<factor1>) <f> | (<factor0>)*(<factor1>)   |
+                (<factor2>) <f> | (<factor0>)*(<factor2>)           
+
+
+<f>         ::= <&2><&2>
+<factor0>   ::= c[<-100,100>]<&1> <&2>
+<factor1>   ::= <S> <&2>        |
+                <colIndex> <&2> 
+<factor2>   ::= <S>*<colIndex>                          
+
+
+<&2>        ::= <&1>
+<S>         ::= S <&1>              | S^c[<-10,10>]             |
+<colIndex>  ::= colIndex <&1>       | colIndex^c[<-10,10>]
+
+
+<&1>        ::= &
+<-5,5>      ::= GE_constants:-5_0.01_5
+<-10,10>    ::= GE_constants:-10_0.1_10
+<-100,100>  ::= GE_constants:-100_0.1_100
+<0,2>       ::= GE_constants:0_0.1_2
+<0.5,1.5>   ::= GE_constants:0.5_0.01_1.5
+<0,3>       ::= GE_constants:0_0.1_3
+<-1000,1000>::= GE_constants:-1000_1_1000
+<80,1000>   ::= GE_constants:80_1_1000
+<800,1000>  ::= GE_constants:800_1_1000
+<-3,-1>     ::= GE_constants:-3_0.1_-1
+

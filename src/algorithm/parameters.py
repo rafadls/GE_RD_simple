@@ -5,6 +5,10 @@ from socket import gethostname
 hostname = gethostname().split('.')
 machine_name = hostname[0]
 
+from sklearn.metrics import explained_variance_score, max_error, mean_absolute_error, mean_squared_error, mean_squared_log_error, median_absolute_error, mean_absolute_percentage_error,r2_score,mean_poisson_deviance,mean_gamma_deviance, mean_tweedie_deviance, d2_tweedie_score, mean_pinball_loss 
+import numpy as np
+
+
 """Algorithm parameters"""
 params = {
     # Set default step and search loop functions
@@ -29,12 +33,23 @@ params = {
     # Optimización
     'smartConstant': True,
 
+    'loss': mean_squared_error, 
+    # explained_variance_score, max_error, mean_absolute_error, 
+    # mean_squared_error, mean_squared_log_error, median_absolute_error, 
+    # mean_absolute_percentage_error,r2_score,mean_poisson_deviance,mean_gamma_deviance, 
+    # mean_tweedie_deviance, d2_tweedie_score, mean_pinball_loss 
+
     'optimizeConstant_each':50,
     'MR': False,
     "Correlation": False,
+    'check_minimum_fitness': False,
+    'media_fitness': np.inf,
     # Select problem dataset
 
     'COEFICIENTE': 3, # 1: cdrag, 2: ff, 3: nusselt
+    'N_CELDAS': 53, # 25, 53, 74, 102
+    'N_ROWS_TRAIN': 1000,
+    'N_ROWS_CORR': 100,
     
     'DATASET_TEST': None,
     'DATASET_DELIMITER': None,
@@ -96,6 +111,7 @@ params = {
     'CROSSOVER_PROBABILITY': 0.75,
     # Prevents crossover from generating invalids.
     'NO_CROSSOVER_INVALIDS': False,
+    'crossover_tries':10,
 
     # MUTATION
     # Set mutation operator.
@@ -107,7 +123,7 @@ params = {
     'MUTATION_EVENTS': 1,
     # Prevents mutation from generating invalids.
     'NO_MUTATION_INVALIDS': False,
-    'mutation_trys':10,
+    'mutation_tries':10,
 
     # REPLACEMENT
     # Set replacement operator.

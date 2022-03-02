@@ -33,6 +33,9 @@ def step(individuals,optimization=False):
 
     # Replace the old population with the new population.
     individuals = replacement(new_pop, individuals)
+    
+    # sort
+    individuals.sort(reverse=True)
 
     # Generate statistics for run so far
     get_stats(individuals)

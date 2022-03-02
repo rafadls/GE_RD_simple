@@ -1,26 +1,13 @@
 import numpy as np
 np.seterr(all="raise")
-import numexpr as ne
-import time
 
+from algorithm.parameters import params
 from utilities.fitness.optimize_constants import *
-import os
-from contextlib import contextmanager
-import tblib.pickling_support
-import sys
-import math
-from copy import deepcopy     
+ 
 import pandas as pd 
+from sklearn.metrics import explained_variance_score, max_error, mean_absolute_error, mean_squared_error, mean_squared_log_error, median_absolute_error, mean_absolute_percentage_error,r2_score,mean_poisson_deviance,mean_gamma_deviance, mean_tweedie_deviance, d2_tweedie_score, mean_pinball_loss 
 
-from sklearn.metrics import mean_squared_error
 
-def check_invalid_result(modelResult):
-    for data_row in modelResult:
-        for variable_out in data_row:
-            for value in variable_out:
-                if math.isinf(value) or math.isnan(value):
-                    return True
-    return False
 
 def if_lower_else(a,b,c,d):
   if a<=b:
@@ -70,11 +57,11 @@ def evaluar_n(exp, df):
 
 def eval_allData(exp, df):
   if params['COEFICIENTE']==1:
-    return evaluar_cdrag(exp, df)
+    return np.real(evaluar_cdrag(exp, df))
   elif params['COEFICIENTE']==2:
-    return evaluar_ff(exp, df)
+    return np.real(evaluar_ff(exp, df))
   elif params['COEFICIENTE']==3:
-    return evaluar_n(exp, df)
+    return np.real(evaluar_n(exp, df))
 
 def check(dic, corrmat_pred, col):
   sentido_fisico = []
@@ -86,60 +73,37 @@ def check(dic, corrmat_pred, col):
       no_sentido_fisico.append(param)
   return len(no_sentido_fisico) == 0
 
-def RMSE(y,y_pred):
-  mse = mean_squared_error(y, y_pred)
-  rmse = np.sqrt(mse)
-  return rmse
+def check_minimum_fitness(fitness):
+  if params['check_minimum_fitness']:
+    if fitness <= params['media_fitness']:
+      return True
+    else:
+      return False
+  else:
+    return True
 
-def check_correlation(ind):
+def check_correlation(df, y_pred):
   if not params["Correlation"]:
     return True
-  ind_ph = deepcopy(ind.phenotype)
-  ind_ph = str(ind_ph)
-  ind_ph = ind_ph.replace("&","")
-  ind_ph = ind_ph.replace("^","**")
-  zipped = get_consts(ind_ph)
-  if len(zipped) != 0:
-      acc_values, init_values, step_values, last_values, constantes = zip(*zipped)
-      acc_values = list(acc_values)
-      init_values = list(init_values)
-      step_values = list(step_values)
-      last_values = list(last_values)
-      constantes = list(constantes)
-      ind_ph = replace_consts_no_assumption(ind_ph, acc_values, init_values, step_values, last_values, constantes)
-  df_cdrag, df_ff, df_n = get_data_correlation()
+  df['pred'] = y_pred
+  df_corr = df.sample(n=params['N_ROWS_CORR'])
+  corrmat = df_corr.corr()
+  corrmat_pred = corrmat[['pred']]
   if params['COEFICIENTE'] == 1:
-    try:
-      df_cdrag['cdrag_pred'] = evaluar_cdrag(ind_ph, df_cdrag)
-      corrmat = df_cdrag.corr()
-      corrmat_cdrag_pred = corrmat[['cdrag_pred']]
-      dic_cdrag = {'S':	0.476021,'colIndex':	0.252838,'fluidColumn':	0.114454,'Rem':	-0.267775,'Dfn':	-0.292734,'An':	-0.481160}
-      return check(dic_cdrag, corrmat_cdrag_pred, 'cdrag_pred')
-    except:
-      return False
+    dic = {'S':	0.476021,'colIndex':	0.252838,'Rem':	-0.267775,'Dfn':	-0.292734,'An':	-0.481160}
   elif params['COEFICIENTE'] == 2:
-    try:
-      df_ff['ff_pred'] = evaluar_ff(ind_ph, df_ff)
-      corrmat = df_ff.corr()
-      corrmat_ff_pred = corrmat[['ff_pred']]
-      dic_ff = {'colIndex':	0.180658,'Dfn':	0.162611,'Rem':	-0.146201,'Vmfn':	-0.843099,'S':	-0.853635}
-      return check(dic_ff, corrmat_ff_pred, 'ff_pred')
-    except:
-      return False
+    dic = {'Vmfn':	-0.843099,'S': -0.853635}
   elif params['COEFICIENTE'] == 3:
-    try:
-      df_n['n_pred'] = evaluar_n(ind_ph, df_n)
-      corrmat = df_n.corr()
-      corrmat_n_pred = corrmat[['n_pred']]
-      dic_n = {'Rem':	0.860579,'Prandtl':	-0.024847,'S':	-0.113077,'colIndex':	-0.318418}
-      return check(dic_n, corrmat_n_pred, 'n_pred')
-    except:
-      return False
+    dic = {'Rem':	0.860579,'colIndex':	-0.318418}
+  return check(dic, corrmat_pred, 'pred')
 
-
-def get_data_correlation():
-  path = '../datasets/DATASET_correlation/'
-  df_cdrag = pd.read_csv(path + 'df_cdrag.txt')
-  df_ff = pd.read_csv(path + 'df_ff.txt')
-  df_n = pd.read_csv(path + 'df_n.txt')
-  return df_cdrag, df_ff, df_n
+def get_data():
+  path = '../datasets/ModeloBaterias/'
+  if params['COEFICIENTE']==1:
+    data = pd.read_csv(path + 'df_' + str(params['N_CELDAS']) + '_cdrag.txt')
+  elif params['COEFICIENTE']==2:
+    data = pd.read_csv(path + 'df_' + str(params['N_CELDAS']) + '_ff.txt')
+  elif params['COEFICIENTE']==3:
+    data = pd.read_csv(path + 'df_' + str(params['N_CELDAS']) + '_n.txt')
+  data_train = data.sample(n=params['N_ROWS_TRAIN'])
+  return data_train.iloc[:,:-1], data_train.iloc[:,-1].values

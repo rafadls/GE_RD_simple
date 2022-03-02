@@ -9,12 +9,9 @@ from representation.latent_tree import latent_tree_crossover, \
 from utilities.representation.check_methods import check_ind
 
 from fitness.evaluation import evaluate_fitness
-import numpy as np
 from fitness.funciones_fitness import *
 
 def crossover(parents):
-    print()
-    print('CROSSOVER')
     """
     Perform crossover on a population of individuals. The size of the crossover
     population is defined as params['GENERATION_SIZE'] rather than params[
@@ -33,31 +30,41 @@ def crossover(parents):
 
         # Randomly choose two parents from the parent population.
         inds_in = sample(parents, 2)
-
         # Perform crossover on chosen parents.
-        inds_out = crossover_inds(inds_in[0], inds_in[1])
-
-        if inds_out is None:
-            # Crossover failed.
-            pass
-
+        intentos_de_mutacion=0
+        bool_cross = False
+        if params["MR"]:
+            for i in range(params['crossover_tries']):
+                inds_out = crossover_inds(inds_in[0], inds_in[1])
+                if inds_out is None:
+                    # Crossover failed.
+                    pass
+                else:
+                    inds_out = evaluate_fitness(inds_out)
+                    for ind in inds_out:
+                        if not math.isnan(ind.fitness):
+                            if ind.check_result:
+                                cache[ind.phenotype] = ind.fitness
+                                cross_pop.append(ind)
+                                bool_cross = True
+                    if bool_cross:
+                        break
+            if not bool_cross:
+                if inds_out is None:
+                    pass
+                else:
+                    inds_out = evaluate_fitness(inds_out)
+                    for ind in inds_out:
+                        if not math.isnan(ind.fitness):
+                            if ind.check_result:
+                                cache[ind.phenotype] = ind.fitness
+                                cross_pop.append(ind)
         else:
-            # Extend the new population.
-            inds_out = evaluate_fitness(inds_out)
-            if params["MR"]:
-                for ind in inds_out:
-                    check = check_correlation(ind)
-                    if check and (not np.isnan(ind.fitness)) and (not np.isinf(ind.fitness)) and (not ind.phenotype in cache.keys()):
-                        print('Se agrega individuo: ' + ind.phenotype)
-                        cache[ind.phenotype] = ind.fitness
-                        cross_pop.append(ind)
-            else:
-                for ind in inds_out:
-                    if (not np.isnan(ind.fitness)) and (not np.isinf(ind.fitness)):
-                        cache[ind.phenotype] = ind.fitness
-                        print('Se agrega individuo: ' + ind.phenotype)
-                        cross_pop.append(ind)
-
+            inds_out = crossover_inds(inds_in[0], inds_in[1])
+            for ind in inds_out:
+                if ind.fitness!=None:
+                    cache[ind.phenotype] = ind.fitness
+                    cross_pop.append(ind)   
     return cross_pop
 
 
@@ -90,6 +97,7 @@ def crossover_inds(parent_0, parent_1):
 
     if any(checks):
         # An individual violates a limit.
+        print("---------------------NONE----------------")
         return None
 
     else:

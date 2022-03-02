@@ -21,7 +21,7 @@ def custom_optimize_constants2(x, y, ind, actualizeGenome=False):
     if n_ctes == 0:
         c = []
         ind.opt_consts = c
-        fitness = params['FITNESS_FUNCTION'].fitness_stringPhenotype(new_phenotype)
+        check_resutl, fitness = params['FITNESS_FUNCTION'].fitness_stringPhenotype(new_phenotype)
         return fitness
 
     [best_result, best_constant, best_val_pos] = seudo_gradient_optimization(acc_values_int, lower_values_float, 
@@ -194,7 +194,7 @@ def make_consts_consecutive(s, returnInit=False):
         return s, n_ctes
     
 def eval_fun(fun):
-    fitness = params['FITNESS_FUNCTION'].fitness_stringPhenotype(fun)
+    check_resutl, fitness = params['FITNESS_FUNCTION'].fitness_stringPhenotype(fun)
     return fitness
 
 def replace_consts_with_values(s, c, acc_values_int):

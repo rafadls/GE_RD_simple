@@ -62,25 +62,17 @@ def uniform_genome_original(size):
 
 
 def uniformgenome(size):
-    print()
-    print("size: " + str(size))
     inds_to_return = []
     for i in range(size):
         genome = sample_genome()
         ind = individual.Individual(genome, None)
         ind = evaluate_fitness([ind])[0]
-        check = check_correlation(ind)
-        while (not check) or np.isnan(ind.fitness) or np.isinf(ind.fitness) or (ind.phenotype in cache.keys()):
+        while np.isnan(ind.fitness) or np.isinf(ind.fitness) or (ind.phenotype in cache.keys()):
             genome = sample_genome()
             ind = individual.Individual(genome, None)    
             ind = evaluate_fitness([ind])[0]
-            check = check_correlation(ind)
         cache[ind.phenotype] = ind.fitness
         inds_to_return.append(ind)
-        print('individuo creado')
-        print('depth: ' + str(ind.depth))
-    print("size: " + str(len(inds_to_return)))
-    print()
     return inds_to_return
 
 def uniform_tree(size):

@@ -1,5 +1,5 @@
 from copy import copy
-from os import getcwd, makedirs, path
+from os import getcwd, makedirs, path, listdir
 from shutil import rmtree
 
 from algorithm.parameters import params
@@ -118,34 +118,16 @@ def generate_folders_and_files():
 
     :return: Nothing.
     """
+    params['FILE_PATH'] = path.join("..", "results")
 
-    if params['EXPERIMENT_NAME']:
-        # Experiment manager is being used.
-        path_1 = path.join(getcwd(), "..", "results")
-
-        if not path.isdir(path_1):
-            # Create results folder.
-            makedirs(path_1, exist_ok=True)
-
-        # Set file path to include experiment name.
-        params['FILE_PATH'] = path.join(path_1, params['EXPERIMENT_NAME'])
-
-    else:
-        # Set file path to results folder.
-        params['FILE_PATH'] = path.join(getcwd(), "..", "results")
-
-    # Generate save folders
-    if not path.isdir(params['FILE_PATH']):
-        makedirs(params['FILE_PATH'], exist_ok=True)
-
-    if not path.isdir(path.join(params['FILE_PATH'],
-                                str(params['TIME_STAMP']))):
-        makedirs(path.join(params['FILE_PATH'],
-                           str(params['TIME_STAMP'])), exist_ok=True)
-
-    params['FILE_PATH'] = path.join(params['FILE_PATH'],
-                                    str(params['TIME_STAMP']))
-
+    folders = listdir(params['FILE_PATH'])
+    counter = 0
+    while True:
+        if str(counter) not in folders:
+            break
+        counter += 1 
+    params['FILE_PATH'] = path.join(params['FILE_PATH'], str(counter))
+    makedirs(params['FILE_PATH'], exist_ok=True)
     save_params_to_file()
 
 

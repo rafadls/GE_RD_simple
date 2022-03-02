@@ -1,0 +1,14 @@
+{
+"variableParams": 
+    {
+    "COEFICIENTE": [2], 
+    "POPULATION_SIZE": [50],
+    "GENERATIONS": [50],
+    "CROSSOVER_PROBABILITY": [0.75],
+    "MUTATION_PROBABILITY": [0.15],
+    "optimizeConstant_each":[50],
+    "MR": [false,true],
+    "Correlation": [false,true],
+    "check_minimum_fitness": [false,true]
+    }
+}

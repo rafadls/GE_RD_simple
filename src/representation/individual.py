@@ -32,6 +32,7 @@ class Individual(object):
             self.genome, self.tree = genome, ind_tree
 
         self.fitness = params['FITNESS_FUNCTION'].default_fitness
+        self.ckeck_result = True
         self.runtime_error = False
         self.name = None
 
@@ -112,6 +113,7 @@ class Individual(object):
         new_ind.depth, new_ind.nodes = self.depth, self.nodes
         new_ind.used_codons = self.used_codons
         new_ind.runtime_error = self.runtime_error
+        new_ind.ckeck_result = self.ckeck_result
         return new_ind
 
     def evaluate(self,optimization=False):
@@ -126,7 +128,7 @@ class Individual(object):
         """
 
         # Evaluate fitness using specified fitness function.
-        self.fitness = params['FITNESS_FUNCTION'](self,optimization=optimization)
+        self.check_result, self.fitness = params['FITNESS_FUNCTION'](self,optimization=optimization)
 
         if params['MULTICORE']:
             return self

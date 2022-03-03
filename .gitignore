@@ -1,8 +1,5 @@
-*.py[cod]
 __pycache__/
-.DS_Store
 results/
-Banknote.csv
-Banknote_shuf.csv
-.idea/
+datasets/
+Experiments/
 src/python_log.txt

@@ -1,9 +1,9 @@
-COEFICIENTE: 2
+COEFICIENTE: 3
 POPULATION_SIZE: 50
 GENERATIONS: 50
 CROSSOVER_PROBABILITY: 0.75
 MUTATION_PROBABILITY: 0.15
 optimizeConstant_each: 50
 MR: True
-Correlation: True
-check_minimum_fitness: True
+Correlation: False
+check_minimum_fitness: False

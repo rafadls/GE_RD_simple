@@ -17,7 +17,7 @@ pip install -r requirements.txt
 
 
 To set the grid edit the "parameters/listaDeParametros.json" file
-```
+;;;
 {
 "variableParams": 
     {
@@ -32,7 +32,7 @@ To set the grid edit the "parameters/listaDeParametros.json" file
     "check_minimum_fitness": [false]
     }
 }
-```
+;;;
 
 **Run**
 

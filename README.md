@@ -13,10 +13,13 @@ cd GE_RD_simple
 pip install -r requirements.txt
 ```
 
+**Variable**
+To set the grid edit the "parameters/listaDeParametros.json" file
+
 **Run**
 
 ```bash
 cd src/
-python ponyge.py
+python ponyge.py --variable
 ```
 

@@ -31,38 +31,36 @@ def crossover(parents):
         # Randomly choose two parents from the parent population.
         inds_in = sample(parents, 2)
         # Perform crossover on chosen parents.
-        intentos_de_mutacion=0
-        bool_cross = False
         if params["MR"]:
-            for i in range(params['crossover_tries']):
+            intentos_de_crossover=0
+            individuos_intentos = []
+            while intentos_de_crossover<params['crossover_tries']:
                 inds_out = crossover_inds(inds_in[0], inds_in[1])
                 if inds_out is None:
-                    # Crossover failed.
-                    pass
+                    continue
+                ind_1, ind_2 = evaluate_fitness(inds_out)
+                if math.isnan(ind_1.fitness) or math.isnan(ind_2.fitness):
+                    continue
+                if ind_1.check_result and (not ind_1.phenotype in cache.keys()):
+                        cache[ind_1.phenotype] = ind_1.fitness
+                        cross_pop.append(ind_1)
+                if ind_2.check_result and (not ind_2.phenotype in cache.keys()):
+                        cache[ind_2.phenotype] = ind_2.fitness
+                        cross_pop.append(ind_2)
+                if  ind_1.check_result or ind_2.check_result:
+                    break
                 else:
-                    inds_out = evaluate_fitness(inds_out)
-                    for ind in inds_out:
-                        if not math.isnan(ind.fitness):
-                            if ind.check_result:
-                                cache[ind.phenotype] = ind.fitness
-                                cross_pop.append(ind)
-                                bool_cross = True
-                    if bool_cross:
-                        break
-            if not bool_cross:
-                if inds_out is None:
-                    pass
-                else:
-                    inds_out = evaluate_fitness(inds_out)
-                    for ind in inds_out:
-                        if not math.isnan(ind.fitness):
-                            if ind.check_result:
-                                cache[ind.phenotype] = ind.fitness
-                                cross_pop.append(ind)
+                    individuos_intentos.extend([ind_1, ind_2])
+            if len(individuos_intentos)==2*params['crossover_tries']:
+                individuos_intentos.sort(reverse=True)
+                cache[individuos_intentos[0].phenotype] = individuos_intentos[0].fitness
+                cache[individuos_intentos[1].phenotype] = individuos_intentos[1].fitness
+                cross_pop.append(individuos_intentos[0])
+                cross_pop.append(individuos_intentos[1])
         else:
             inds_out = crossover_inds(inds_in[0], inds_in[1])
             for ind in inds_out:
-                if ind.fitness!=None:
+                if ind.fitness!=None and (not ind.phenotype in cache.keys()):
                     cache[ind.phenotype] = ind.fitness
                     cross_pop.append(ind)   
     return cross_pop

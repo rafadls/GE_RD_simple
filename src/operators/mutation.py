@@ -87,24 +87,29 @@ def int_flip_per_codon(ind):
         if random() < p_mut:
             if params["MR"]:
                 intentos_de_mutacion = 0
+                individuos_intentos = []
                 while intentos_de_mutacion<params['mutation_tries']:
                     base_genome = ind.genome
                     base_genome[i] = randint(0, params['CODON_SIZE'])
                     new_ind_test = individual.Individual(base_genome, None)
+                    if new_ind_test.phenotype in cache.keys():
+                        continue
                     new_ind_test.evaluate()
                     if not new_ind_test.check_result:
                         intentos_de_mutacion += 1
+                        individuos_intentos.append(new_ind_test)
                     else:
                         ind.genome = base_genome
                         break
+                if len(individuos_intentos)==params['mutation_tries']:
+                    individuos_intentos.sort(reverse=True)
+                    ind.genome = individuos_intentos[0].genome
             else:
                 ind.genome[i] = randint(0, params['CODON_SIZE'])
     new_ind = individual.Individual(ind.genome, None)
     new_ind.evaluate()
     cache[new_ind.phenotype] = new_ind.fitness
     return new_ind
-        
-
 
 def int_flip_per_ind(ind):
     """

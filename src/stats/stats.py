@@ -5,6 +5,7 @@ from time import time
 import numpy as np
 import pandas as pd
 import os
+import json
 from algorithm.parameters import params
 from utilities.algorithm.NSGA2 import compute_pareto_metrics
 from utilities.algorithm.state import create_state
@@ -366,17 +367,14 @@ def print_final_stats():
     :return: Nothing.
     """
     mainPath = os.path.abspath("..")
+    path_file = os.sep.join([mainPath, "parameters", "listaDeParametros.json"])
+    with open(path_file, 'r') as json_file:
+        variableParams = json.load(json_file)["variableParams"]
+
     df =  pd.read_csv(mainPath + '/Experiments/data.csv')
-    bool_coef = df["COEFICIENTE"]==params["COEFICIENTE"]
-    bool_pop = df['POPULATION_SIZE']==params['POPULATION_SIZE']
-    bool_gen = df['GENERATIONS']==params['GENERATIONS']
-    bool_cp = df['CROSSOVER_PROBABILITY']==params['CROSSOVER_PROBABILITY']
-    bool_mp = df['MUTATION_PROBABILITY']==params['MUTATION_PROBABILITY']
-    bool_oe = df["optimizeConstant_each"]==params["optimizeConstant_each"]
-    bool_mr = df["MR"]==params["MR"]
-    bool_corr = df["Correlation"]==params["Correlation"]
-    bool_cmf = df["check_minimum_fitness"]==params["check_minimum_fitness"]
-    bool_total = bool_coef & bool_pop & bool_gen & bool_cp & bool_mp & bool_oe & bool_mr & bool_corr & bool_cmf 
+    bool_total = True
+    for key in variableParams:
+        bool_total = bool_total &  (df[key] == params[key])
     df.loc[bool_total, 'Best fitness'] = trackers.best_ever.fitness
     df.loc[bool_total, 'Best phenotype'] = trackers.best_ever.phenotype
     df.loc[bool_total, 'Total time'] = trackers.time_list[-1] - trackers.time_list[0]

@@ -10,8 +10,8 @@ import time
 
 def list2dic(lista):
   dic = {}
-  for item in lista:
-    dic[item[0]] = item[1]
+  for key, value in lista:
+    dic[key] = value
   return dic
 
 def saveGenerationAsExcel(individuals, folder_path, file_name, folder_name="savedPopulations"):

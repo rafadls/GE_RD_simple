@@ -84,7 +84,7 @@ params = {
     'INITIALISATION': "operators.initialisation.uniformgenome",
     # Set the maximum genome length for initialisation.
     'INIT_GENOME_LENGTH': 200,
-    # Set the maximum tree depth for initialisation.
+    # Set the maximum tree depth for initialisation.FITNESS_FUNCTION'
     'MAX_INIT_TREE_DEPTH': 10,
     # Set the minimum tree depth for initialisation.
     'MIN_INIT_TREE_DEPTH': None,
@@ -141,7 +141,7 @@ params = {
     # command line.
     'VERBOSE': False,
     # Use this to prevent anything being printed to the command line.
-    'SILENT': False,
+    'SILENT': True,
 
     # SAVING
     # Save the phenotype of the best individual from each generation. Can

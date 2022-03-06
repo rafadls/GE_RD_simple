@@ -1,7 +1,7 @@
 from math import floor
 from os import getcwd, listdir, path
 from random import randint, shuffle
-
+import sys
 from algorithm.parameters import params
 from utilities.stats.trackers import cache
 from representation import individual
@@ -73,6 +73,7 @@ def uniformgenome(size):
             ind = evaluate_fitness([ind])[0]
         cache[ind.phenotype] = ind.fitness
         inds_to_return.append(ind)
+        sys.stdout.write("\r Initialization,  %d / %d                                   " %(i+1,size))
     return inds_to_return
 
 def uniform_tree(size):

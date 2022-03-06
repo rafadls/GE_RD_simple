@@ -1,7 +1,5 @@
-COEFICIENTE,CROSSOVER_PROBABILITY,Correlation,GENERATIONS,MR,MUTATION_PROBABILITY,POPULATION_SIZE,check_minimum_fitness,optimizeConstant_each,Best fitness,Best phenotype,Total time
-1.0,0.75,0.0,50.0,0.0,0.15,50.0,0.0,50.0,0.16420277052662885,"if_lower_else(Rem, 111.0, ((((An**-3.2*Dfn**4.4*fluidColumn *S *colIndex )  + 0)     / ((98.9 )*(S**3.1 ) + (fluidColumn**-7.9*S  ) )))*Rem , 1.46)",91.61481070518494
-1.0,0.75,0.0,50.0,1.0,0.15,50.0,0.0,50.0,0.14310197790449974,"if_lower_else(Rem, 80.0, ((((-96.3 )  + 0)     / ((Dfn**4.6 )  + (-22.3 )*(An *Dfn *fluidColumn *S *colIndex ))))*Rem , 1.5)",2553.470209360123
-2.0,0.75,0.0,50.0,0.0,0.15,50.0,0.0,50.0,3.1580375157659235,((((4.1 )*(Dfn**-4.6*colIndex  ) + (-1.5 ))  / ((1.0 )*(S *colIndex  ) + 0)))**((((colIndex**-0.1 ) + 0)     / (1))),210.74135208129883
-2.0,0.75,0.0,50.0,1.0,0.15,50.0,0.0,50.0,1.0841808160421331,((((3.4 )*(Dfn  ) + (-4.1 )*(Vmfn**1.7*S *colIndex**-0.9 ))  / ((Dfn**-1.3*S  ) + 0)))+((((-4.8 ) + (-2.5 )*(S *colIndex  ))  / ((-1.6 )*(Rem**2.1*Vmfn**-4.1*S  ) + (Dfn *colIndex**-0.2 )))),3222.6662197113037
-3.0,0.75,0.0,50.0,0.0,0.15,50.0,0.0,50.0,62.82545905296129,(0.07)*(Rem**(0.868))*(Prandtl**(1.7119)),96.02643394470215
-3.0,0.75,0.0,50.0,1.0,0.15,50.0,0.0,50.0,42.38071801245635,(0.65)*(Rem**(0.5942))*(Prandtl**(1.4774)),562.5179333686829
+COEFICIENTE,CROSSOVER_PROBABILITY,Correlation,GENERATIONS,MR,MUTATION_PROBABILITY,N_CELDAS,N_ROWS_CORR,N_ROWS_TRAIN,POPULATION_SIZE,check_minimum_fitness,crossover_tries,mutation_tries,optimizeConstant_each
+2.0,0.75,0.0,10.0,1.0,0.15,53.0,100.0,1000.0,10.0,1.0,10.0,10.0,50.0
+2.0,0.75,0.0,10.0,1.0,0.15,53.0,100.0,1000.0,10.0,1.0,10.0,30.0,50.0
+2.0,0.75,0.0,10.0,1.0,0.15,53.0,100.0,1000.0,10.0,1.0,30.0,10.0,50.0
+2.0,0.75,0.0,10.0,1.0,0.15,53.0,100.0,1000.0,10.0,1.0,30.0,30.0,50.0

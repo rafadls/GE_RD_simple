@@ -7,9 +7,10 @@ from representation.derivation import generate_tree
 from representation.latent_tree import latent_tree_mutate, latent_tree_repair
 from utilities.representation.check_methods import check_ind
 from fitness.funciones_fitness import *
-
+from stats.stats import get_stats, stats
 from fitness.evaluation import evaluate_fitness
 import numpy as np
+import sys
 
 def mutation(pop):
     """
@@ -52,7 +53,8 @@ def mutation(pop):
 
         # Append mutated individual to population.
         new_pop.append(new_ind)
-
+        perc = stats['gen'] / (params['GENERATIONS'] + 1) * 100
+        sys.stdout.write("\r Evolution: %d%% complete || Mutation  %d / %d \r" %(perc, len(new_pop),len(pop)))
     return new_pop
 
 

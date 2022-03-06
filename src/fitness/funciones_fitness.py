@@ -107,3 +107,17 @@ def get_data():
     data = pd.read_csv(path + 'df_' + str(params['N_CELDAS']) + '_n.txt')
   data_train = data.sample(n=params['N_ROWS_TRAIN'])
   return data_train.iloc[:,:-1], data_train.iloc[:,-1].values
+
+def get_all_data():
+  path = '../datasets/ModeloBaterias/'
+  if params['COEFICIENTE']==1:
+      text = '_cdrag.txt'
+  if params['COEFICIENTE']==2:
+      text = '_ff.txt'
+  if params['COEFICIENTE']==3:
+      text = '_n.txt'
+  data_25 = pd.read_csv(path + 'df_' + str(25) + text)
+  data_53 = pd.read_csv(path + 'df_' + str(53) + text)
+  data_74 = pd.read_csv(path + 'df_' + str(74) + text)
+  data_102 = pd.read_csv(path + 'df_' + str(102) + text)
+  return data_25, data_53, data_74, data_102

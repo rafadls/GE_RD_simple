@@ -2,8 +2,9 @@ from random import choice, randint, random, sample
 
 from algorithm.parameters import params
 from utilities.stats.trackers import cache
-
+from stats.stats import get_stats, stats
 from representation import individual
+import sys
 from representation.latent_tree import latent_tree_crossover, \
     latent_tree_repair
 from utilities.representation.check_methods import check_ind
@@ -32,9 +33,9 @@ def crossover(parents):
         inds_in = sample(parents, 2)
         # Perform crossover on chosen parents.
         if params["MR"]:
-            intentos_de_crossover=0
             individuos_intentos = []
-            while intentos_de_crossover<params['crossover_tries']:
+            while len(individuos_intentos)<params['crossover_tries']:
+                se_agrega = False
                 inds_out = crossover_inds(inds_in[0], inds_in[1])
                 if inds_out is None:
                     continue
@@ -44,25 +45,34 @@ def crossover(parents):
                 if ind_1.check_result and (not ind_1.phenotype in cache.keys()):
                         cache[ind_1.phenotype] = ind_1.fitness
                         cross_pop.append(ind_1)
+                        se_agrega = True
                 if ind_2.check_result and (not ind_2.phenotype in cache.keys()):
                         cache[ind_2.phenotype] = ind_2.fitness
                         cross_pop.append(ind_2)
-                if  ind_1.check_result or ind_2.check_result:
+                        se_agrega = True
+                if se_agrega:
                     break
                 else:
-                    individuos_intentos.extend([ind_1, ind_2])
-            if len(individuos_intentos)==2*params['crossover_tries']:
+                    if (not ind_1.phenotype in cache.keys()):
+                        individuos_intentos.append(ind_1)
+                    if (not ind_2.phenotype in cache.keys()):
+                        individuos_intentos.append(ind_2)
+            #print('individuos_intentos: ' + str(len(individuos_intentos)))
+            if len(individuos_intentos)>=params['crossover_tries']:
                 individuos_intentos.sort(reverse=True)
                 cache[individuos_intentos[0].phenotype] = individuos_intentos[0].fitness
                 cache[individuos_intentos[1].phenotype] = individuos_intentos[1].fitness
                 cross_pop.append(individuos_intentos[0])
                 cross_pop.append(individuos_intentos[1])
+            #print('cross_pop: ' + str(len(cross_pop)))
         else:
             inds_out = crossover_inds(inds_in[0], inds_in[1])
             for ind in inds_out:
                 if ind.fitness!=None and (not ind.phenotype in cache.keys()):
                     cache[ind.phenotype] = ind.fitness
-                    cross_pop.append(ind)   
+                    cross_pop.append(ind)  
+        perc = stats['gen'] / (params['GENERATIONS'] + 1) * 100
+        sys.stdout.write("\r Evolution: %d%% complete || Crossover  %d / %d \r" %(perc, len(cross_pop),params['GENERATION_SIZE']))  
     return cross_pop
 
 

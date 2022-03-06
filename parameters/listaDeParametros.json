@@ -1,14 +1,19 @@
 {
 "variableParams": 
     {
-    "COEFICIENTE": [1,2,3], 
-    "POPULATION_SIZE": [50],
-    "GENERATIONS": [50],
+    "COEFICIENTE": [2], 
+    "POPULATION_SIZE": [10],
+    "GENERATIONS": [10],
     "CROSSOVER_PROBABILITY": [0.75],
     "MUTATION_PROBABILITY": [0.15],
     "optimizeConstant_each":[50],
-    "MR": [false, true],
+    "MR": [true],
     "Correlation": [false],
-    "check_minimum_fitness": [false]
+    "check_minimum_fitness": [true], 
+    "N_CELDAS": [53],
+    "N_ROWS_TRAIN": [1000],
+    "N_ROWS_CORR": [100],
+    "crossover_tries": [10,30],
+    "mutation_tries": [10,30]
     }
 }

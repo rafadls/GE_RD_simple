@@ -95,6 +95,7 @@ def int_flip_per_codon(ind):
                     base_genome[i] = randint(0, params['CODON_SIZE'])
                     new_ind_test = individual.Individual(base_genome, None)
                     if new_ind_test.phenotype in cache.keys():
+                        intentos_de_mutacion +=1
                         continue
                     new_ind_test.evaluate()
                     if not new_ind_test.check_result:

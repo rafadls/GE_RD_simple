@@ -149,6 +149,7 @@ def get_soo_stats(individuals, end):
 
     if end and not params['SILENT']:
         print_final_stats()
+    save_csv()
 
 
 def get_moo_stats(individuals, end):
@@ -359,13 +360,7 @@ def print_first_front_stats():
     for ind in trackers.best_ever:
         print("\t  ", ind.fitness)
 
-
-def print_final_stats():
-    """
-    Prints a final review of the overall evolutionary process.
-
-    :return: Nothing.
-    """
+def save_csv():
     mainPath = os.path.abspath("..")
     path_file = os.sep.join([mainPath, "parameters", "listaDeParametros.json"])
     with open(path_file, 'r') as json_file:
@@ -379,6 +374,13 @@ def print_final_stats():
     df.loc[bool_total, 'Best phenotype'] = trackers.best_ever.phenotype
     df.loc[bool_total, 'Total time'] = trackers.time_list[-1] - trackers.time_list[0]
     df.to_csv(mainPath + '/Experiments/data.csv', index=False)  
+
+def print_final_stats():
+    """
+    Prints a final review of the overall evolutionary process.
+
+    :return: Nothing.
+    """
 
     if hasattr(params['FITNESS_FUNCTION'], "training_test"):
         print("\n\nBest:\n  Training fitness:\t",

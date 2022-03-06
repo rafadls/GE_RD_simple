@@ -10,5 +10,5 @@ check_minimum_fitness: True
 N_CELDAS: 53
 N_ROWS_TRAIN: 1000
 N_ROWS_CORR: 100
-crossover_tries: 30
-mutation_tries: 30
+crossover_tries: 5
+mutation_tries: 5

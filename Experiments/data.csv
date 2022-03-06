@@ -1,5 +1,5 @@
-COEFICIENTE,CROSSOVER_PROBABILITY,Correlation,GENERATIONS,MR,MUTATION_PROBABILITY,N_CELDAS,N_ROWS_CORR,N_ROWS_TRAIN,POPULATION_SIZE,check_minimum_fitness,crossover_tries,mutation_tries,optimizeConstant_each
-2.0,0.75,0.0,10.0,1.0,0.15,53.0,100.0,1000.0,10.0,1.0,10.0,10.0,50.0
-2.0,0.75,0.0,10.0,1.0,0.15,53.0,100.0,1000.0,10.0,1.0,10.0,30.0,50.0
-2.0,0.75,0.0,10.0,1.0,0.15,53.0,100.0,1000.0,10.0,1.0,30.0,10.0,50.0
-2.0,0.75,0.0,10.0,1.0,0.15,53.0,100.0,1000.0,10.0,1.0,30.0,30.0,50.0
+COEFICIENTE,CROSSOVER_PROBABILITY,Correlation,GENERATIONS,MR,MUTATION_PROBABILITY,N_CELDAS,N_ROWS_CORR,N_ROWS_TRAIN,POPULATION_SIZE,check_minimum_fitness,crossover_tries,mutation_tries,optimizeConstant_each,Best fitness,Best phenotype,Total time
+2.0,0.75,0.0,10.0,1.0,0.15,53.0,100.0,1000.0,10.0,1.0,5.0,5.0,50.0,4.3745199648217366,((((colIndex  ) + 0)     / (1)))+((((2.9 )*(colIndex**-4.0 ) + (-3.0 )*(Vmfn**2.9*S *colIndex**2.5 ))  / ((Dfn**4.0*colIndex**1.1 ) + (1.8 )*(Rem**-4.3*Dfn**0.5*Vmfn *S**0.2*colIndex )))),201.1162405014038
+2.0,0.75,0.0,10.0,1.0,0.15,53.0,100.0,1000.0,10.0,1.0,5.0,15.0,50.0,,,
+2.0,0.75,0.0,10.0,1.0,0.15,53.0,100.0,1000.0,10.0,1.0,15.0,5.0,50.0,,,
+2.0,0.75,0.0,10.0,1.0,0.15,53.0,100.0,1000.0,10.0,1.0,15.0,15.0,50.0,,,

@@ -27,31 +27,27 @@ def mutation(pop):
     # Iterate over entire population.
     for ind in pop:
 
-        # If individual has no genome, default to subtree mutation.
-        if not ind.genome and params['NO_MUTATION_INVALIDS']:
-            new_ind = subtree(ind)
+        # Perform mutation.
+        if params["MR"]:
+            correct_check = False
+            individuos_intentos = []
+            while len(individuos_intentos)<params['mutation_tries']:
+                new_ind = params['MUTATION'](ind)
+                if new_ind.check_result and not (check_ind(new_ind, "mutation")):
+                    correct_check = True
+                    break
+                elif new_ind.fitness != np.inf:
+                    if (not new_ind.phenotype in cache.keys()):
+                        individuos_intentos.append(new_ind)
+            #print('intentos_de_mutacion: '  + str(intentos_de_mutacion))
+            #print('len(individuos_intentos): '  + str(len(individuos_intentos)))
+            if not correct_check:
+                new_ind = max(individuos_intentos)
         else:
-            # Perform mutation.
             new_ind = params['MUTATION'](ind)
 
-        # Check ind does not violate specified limits.
-        check = check_ind(new_ind, "mutation")
-
-        while check:
-            # Perform mutation until the individual passes all tests.
-
-            # If individual has no genome, default to subtree mutation.
-            if not ind.genome and params['NO_MUTATION_INVALIDS']:
-                new_ind = subtree(ind)
-
-            else:
-                # Perform mutation.
-                new_ind = params['MUTATION'](ind)
-
-            # Check ind does not violate specified limits.
-            check = check_ind(new_ind, "mutation")
-
         # Append mutated individual to population.
+        cache[new_ind.phenotype] = new_ind.fitness
         new_pop.append(new_ind)
         perc = stats['gen'] / (params['GENERATIONS'] + 1) * 100
         sys.stdout.write("\r Evolution: %d%% complete || Mutation  %d / %d \r" %(perc, len(new_pop),len(pop)))
@@ -87,31 +83,9 @@ def int_flip_per_codon(ind):
     # genome as defined by the within_used flag.
     for i in range(eff_length):
         if random() < p_mut:
-            if params["MR"]:
-                intentos_de_mutacion = 0
-                individuos_intentos = []
-                while intentos_de_mutacion<params['mutation_tries']:
-                    base_genome = ind.genome
-                    base_genome[i] = randint(0, params['CODON_SIZE'])
-                    new_ind_test = individual.Individual(base_genome, None)
-                    if new_ind_test.phenotype in cache.keys():
-                        intentos_de_mutacion +=1
-                        continue
-                    new_ind_test.evaluate()
-                    if not new_ind_test.check_result:
-                        intentos_de_mutacion += 1
-                        individuos_intentos.append(new_ind_test)
-                    else:
-                        ind.genome = base_genome
-                        break
-                if len(individuos_intentos)==params['mutation_tries']:
-                    individuos_intentos.sort(reverse=True)
-                    ind.genome = individuos_intentos[0].genome
-            else:
-                ind.genome[i] = randint(0, params['CODON_SIZE'])
+            ind.genome[i] = randint(0, params['CODON_SIZE'])
     new_ind = individual.Individual(ind.genome, None)
     new_ind.evaluate()
-    cache[new_ind.phenotype] = new_ind.fitness
     return new_ind
 
 def int_flip_per_ind(ind):

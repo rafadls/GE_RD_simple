@@ -125,7 +125,7 @@ def correrParametrosVarios(configurations):
     # EVOLUTION
     def get_fitness_array(n_gen, index):
         fitness_array = []
-        n_invalid_array = []
+        n_valid_array = []
         time_array = []
         duplicated_array = []
         df_inicial = pd.read_excel(mainPath + '/results/'+ str(index) +'/savedPopulations/poblacionInicial.xls')
@@ -134,15 +134,15 @@ def correrParametrosVarios(configurations):
             nombre = 'generation_' + str(i) + '.xls'
             df = pd.read_excel(mainPath + '/results/'+ str(index) +'/savedPopulations/' + nombre)
             fitness_array.append(df['Fitness'].min())
-            n_invalid_array.append(np.sum(df['Fitness'] != np.inf)*100/len(df['Fitness']))
+            n_valid_array.append(np.sum(df['Fitness'] != np.inf)*100/len(df['Fitness']))
             time_array.append(df['Time'][0]-tiempo)
             tiempo = df['Time'][0]
             duplicated_array.append(np.sum(df[['Fenotipo']].duplicated()))
-        return fitness_array, n_invalid_array, time_array, duplicated_array
+        return fitness_array, n_valid_array, time_array, duplicated_array
 
     # EVOLUTION
     df_fitness = pd.DataFrame()
-    df_invalid = pd.DataFrame()
+    df_valid = pd.DataFrame()
     df_time = pd.DataFrame()
     df_duplicated = pd.DataFrame()
 
@@ -150,7 +150,7 @@ def correrParametrosVarios(configurations):
         text = ''
         for column in columns_text:
             text = text + '(' + column + ':' + str(row[column]) + ') '
-        df_fitness[text], df_invalid[text], df_time[text], df_duplicated[text]  = get_fitness_array(int(row['GENERATIONS']), index)
+        df_fitness[text], df_valid[text], df_time[text], df_duplicated[text]  = get_fitness_array(int(row['GENERATIONS']), index)
 
     ###################   evolusion   #####################
     fig = plt.figure(figsize=(20,20))
@@ -229,19 +229,19 @@ def correrParametrosVarios(configurations):
         data_25, data_53, data_74, data_102 = get_all_data()
         ### 25 ####
         fitness_function.data_in, fitness_function.target  =  data_25.iloc[:,:-1], data_25.iloc[:,-1].values
-        ckeck_result, fitness_25 = fitness_function.fitness_stringPhenotype(phenotype)
+        check_result, fitness_25 = fitness_function.fitness_stringPhenotype(phenotype)
         print('fitness_25: ' + str(fitness_25))
         ### 53 ####
         fitness_function.data_in, fitness_function.target  =  data_53.iloc[:,:-1], data_53.iloc[:,-1].values
-        ckeck_result, fitness_53 = fitness_function.fitness_stringPhenotype(phenotype)
+        check_result, fitness_53 = fitness_function.fitness_stringPhenotype(phenotype)
         print('fitness_53: ' + str(fitness_53))
         ### 74 ####
         fitness_function.data_in, fitness_function.target  =  data_74.iloc[:,:-1], data_74.iloc[:,-1].values
-        ckeck_result, fitness_74 = fitness_function.fitness_stringPhenotype(phenotype)
+        check_result, fitness_74 = fitness_function.fitness_stringPhenotype(phenotype)
         print('fitness_74: ' + str(fitness_74))
         ### 102 ####
         fitness_function.data_in, fitness_function.target  =  data_102.iloc[:,:-1], data_102.iloc[:,-1].values
-        ckeck_result, fitness_102 = fitness_function.fitness_stringPhenotype(phenotype)
+        check_result, fitness_102 = fitness_function.fitness_stringPhenotype(phenotype)
         print('fitness_102: ' + str(fitness_102))
         text_array.append(text)
         array_25.append(fitness_25)

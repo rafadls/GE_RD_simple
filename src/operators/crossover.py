@@ -35,42 +35,38 @@ def crossover(parents):
         if params["MR"]:
             intentos_de_crossover = 0
             individuos_intentos = []
-            while (len(individuos_intentos)<params['crossover_tries']) or (intentos_de_crossover<20):
+            while intentos_de_crossover<params['crossover_tries']:
                 se_agrega = False
                 inds_out = crossover_inds(inds_in[0], inds_in[1])
                 if inds_out is None:
                     intentos_de_crossover += 1
                     continue
                 ind_1, ind_2 = evaluate_fitness(inds_out)
-                if math.isnan(ind_1.fitness) or math.isnan(ind_2.fitness):
-                    intentos_de_crossover += 1
-                    continue
-                if ind_1.check_result and (not ind_1.phenotype in cache.keys()):
-                        cache[ind_1.phenotype] = ind_1.fitness
-                        cross_pop.append(ind_1)
-                        se_agrega = True
-                if ind_2.check_result and (not ind_2.phenotype in cache.keys()):
-                        cache[ind_2.phenotype] = ind_2.fitness
-                        cross_pop.append(ind_2)
-                        se_agrega = True
+                if not math.isnan(ind_1.fitness):
+                    if ind_1.check_result and (not ind_1.phenotype in cache.keys()):
+                            cache[ind_1.phenotype] = ind_1.fitness
+                            cross_pop.append(ind_1)
+                            se_agrega = True
+                if not math.isnan(ind_2.fitness):
+                    if ind_2.check_result and (not ind_2.phenotype in cache.keys()):
+                            cache[ind_2.phenotype] = ind_2.fitness
+                            cross_pop.append(ind_2)
+                            se_agrega = True
                 if se_agrega:
                     break
                 else:
+                    intentos_de_crossover += 1
                     if (not ind_1.phenotype in cache.keys()):
                         individuos_intentos.append(ind_1)
                     if (not ind_2.phenotype in cache.keys()):
                         individuos_intentos.append(ind_2)
             #print('individuos_intentos: ' + str(len(individuos_intentos)))
-            if len(individuos_intentos)>=params['crossover_tries']:
-                individuos_intentos.sort(reverse=True)
-                cache[individuos_intentos[0].phenotype] = individuos_intentos[0].fitness
-                cache[individuos_intentos[1].phenotype] = individuos_intentos[1].fitness
-                cross_pop.append(individuos_intentos[0])
-                cross_pop.append(individuos_intentos[1])
-            elif intentos_de_crossover>=params['crossover_tries'] and len(individuos_intentos)!=0:
-                individuos_intentos.sort(reverse=True)
-                cache[individuos_intentos[0].phenotype] = individuos_intentos[0].fitness
-                cross_pop.append(individuos_intentos[0])
+            #print('intentos_de_crossover: '  + str(intentos_de_crossover))
+            #print('len(individuos_intentos): '  + str(len(individuos_intentos)))
+            if len(individuos_intentos)!=0:
+                new_ind = max(individuos_intentos)
+                cache[new_ind.phenotype] = new_ind.fitness
+                cross_pop.append(new_ind)
             #print('cross_pop: ' + str(len(cross_pop)))
         else:
             inds_out = crossover_inds(inds_in[0], inds_in[1])

@@ -30,8 +30,9 @@ def saveGenerationAsExcel(individuals, folder_path, file_name, folder_name="save
   row = 1
   elapsedTime = time.time()- params["start-time"]
   for ind in individuals:
+      eff_length = min(len(ind.genome), ind.used_codons)
       generation_sheet.write(row,0,elapsedTime)  
-      generation_sheet.write(row,1,str(ind.genome)) 
+      generation_sheet.write(row,1,str(ind.genome[:eff_length])) 
       generation_sheet.write(row,2,str(ind.phenotype))    
       generation_sheet.write(row,3,str(ind.depth))
       generation_sheet.write(row,4,str(ind.fitness))

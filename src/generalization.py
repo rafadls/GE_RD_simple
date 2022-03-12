@@ -41,17 +41,17 @@ ind = individual.Individual([1,1,1,1,1,1,2,22,2,2,2,2,2,2,2,23,3,3,33,3,0,0,0,0,
 
 ### 25 ####
 fitness_function.data_in, fitness_function.target  =  data_25.iloc[:,:-1], data_25.iloc[:,-1].values
-ckeck_result, fitness_25 = fitness_function.evaluate(ind)
+check_result, fitness_25 = fitness_function.evaluate(ind)
 print('fitness_25: ' + str(fitness_25))
 ### 53 ####
 fitness_function.data_in, fitness_function.target  =  data_53.iloc[:,:-1], data_53.iloc[:,-1].values
-ckeck_result, fitness_53 = fitness_function.evaluate(ind)
+check_result, fitness_53 = fitness_function.evaluate(ind)
 print('fitness_53: ' + str(fitness_53))
 ### 74 ####
 fitness_function.data_in, fitness_function.target  =  data_74.iloc[:,:-1], data_74.iloc[:,-1].values
-ckeck_result, fitness_74 = fitness_function.evaluate(ind)
+check_result, fitness_74 = fitness_function.evaluate(ind)
 print('fitness_74: ' + str(fitness_74))
 ### 102 ####
 fitness_function.data_in, fitness_function.target  =  data_102.iloc[:,:-1], data_102.iloc[:,-1].values
-ckeck_result, fitness_102 = fitness_function.evaluate(ind)
+check_result, fitness_102 = fitness_function.evaluate(ind)
 print('fitness_102: ' + str(fitness_102))

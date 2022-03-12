@@ -12,7 +12,7 @@ from utilities.fitness.error_metric import *
 
 from fitness.funciones_fitness import eval_allData, get_data, check_correlation, check_minimum_fitness
 from fitness.base_ff_classes.base_ff import base_ff
-
+from utilities.stats.trackers import cache
 import os
 from contextlib import contextmanager
 import tblib.pickling_support
@@ -30,13 +30,17 @@ class fitness_modelo(base_ff):
         self.data_in, self.target = get_data()
 
     def evaluate(self, ind, **kwargs):
-        ind.phenotype_original = str(ind.phenotype)
-        ind.phenotype = ind.phenotype_original.replace("&","").replace("^","**")
         optimize = kwargs['optimization']
+
+        #if ind.phenotype in cache.keys() and not optimize:
+        #    return True, cache[ind.phenotype]
+        
         if optimize:
             custom_optimize_constants2(self.data_in, self.target, ind, actualizeGenome=True)    
         else:
-            zipped = get_consts(ind.phenotype)
+            if ind.phenotype_original=='':
+                ind.phenotype_original = str(ind.phenotype).replace("&","").replace("^","**")
+            zipped = get_consts(ind.phenotype_original)
             if len(zipped) != 0:
                 acc_values, init_values, step_values, last_values, constantes = zip(*zipped)
                 acc_values = list(acc_values)
@@ -44,9 +48,9 @@ class fitness_modelo(base_ff):
                 step_values = list(step_values)
                 last_values = list(last_values)
                 constantes = list(constantes)
-                ind.phenotype = replace_consts_no_assumption(ind.phenotype, acc_values, init_values, step_values, last_values, constantes)
-        ckeck_result, fitness = self.fitness_stringPhenotype(ind.phenotype)
-        return ckeck_result,fitness
+                ind.phenotype = replace_consts_no_assumption(ind.phenotype_original, acc_values, init_values, step_values, last_values, constantes)
+        check_result, fitness = self.fitness_stringPhenotype(ind.phenotype)
+        return check_result,fitness
 
 
     def fitness_stringPhenotype(self, phenotype):
@@ -57,7 +61,9 @@ class fitness_modelo(base_ff):
             elif np.isinf(y_pred).any():
                 return False, math.inf
             fitness_calculado = params['loss'](self.target,y_pred)
-            if (not check_correlation(self.data_in, y_pred)):
+            if fitness_calculado == np.inf:
+                return False, fitness_calculado
+            elif (not check_correlation(self.data_in, y_pred)):
                 return False, fitness_calculado
             elif not check_minimum_fitness(fitness_calculado):
                 return False, fitness_calculado

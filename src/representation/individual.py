@@ -20,7 +20,11 @@ class Individual(object):
         :param map_ind: A boolean flag that indicates whether or not an
         individual needs to be mapped.
         """
-
+        self.fitness = params['FITNESS_FUNCTION'].default_fitness
+        self.check_result = False
+        self.runtime_error = False
+        self.name = None
+        self.phenotype_original = ''
         if map_ind:
             # The individual needs to be mapped from the given input
             # parameters.
@@ -30,11 +34,6 @@ class Individual(object):
         else:
             # The individual does not need to be mapped.
             self.genome, self.tree = genome, ind_tree
-
-        self.fitness = params['FITNESS_FUNCTION'].default_fitness
-        self.ckeck_result = True
-        self.runtime_error = False
-        self.name = None
 
     def __lt__(self, other):
         """
@@ -113,7 +112,8 @@ class Individual(object):
         new_ind.depth, new_ind.nodes = self.depth, self.nodes
         new_ind.used_codons = self.used_codons
         new_ind.runtime_error = self.runtime_error
-        new_ind.ckeck_result = self.ckeck_result
+        new_ind.check_result = self.check_result
+        new_ind.phenotype_original = self.phenotype_original
         return new_ind
 
     def evaluate(self,optimization=False):

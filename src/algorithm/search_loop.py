@@ -37,7 +37,6 @@ def search_loop():
     # Traditional GE
     for generation in range(1, (params['GENERATIONS'] + 1)):
         stats['gen'] = generation
-
         # New generation
         if generation%params["optimizeConstant_each"] == 0:
             individuals = params['STEP'](individuals, optimization=True)

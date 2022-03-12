@@ -105,8 +105,8 @@ def get_data():
     data = pd.read_csv(path + 'df_' + str(params['N_CELDAS']) + '_ff.txt')
   elif params['COEFICIENTE']==3:
     data = pd.read_csv(path + 'df_' + str(params['N_CELDAS']) + '_n.txt')
-  data_train = data.sample(n=params['N_ROWS_TRAIN'])
-  return data_train.iloc[:,:-1], data_train.iloc[:,-1].values
+  data = data.sample(n=params['N_ROWS_TRAIN'])
+  return data.iloc[:,:-1], data.iloc[:,-1].values
 
 def get_all_data():
   path = '../datasets/ModeloBaterias/'

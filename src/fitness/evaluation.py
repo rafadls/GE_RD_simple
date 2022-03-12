@@ -3,7 +3,7 @@ import numpy as np
 from algorithm.parameters import params
 from stats.stats import stats
 from utilities.stats.trackers import cache, runtime_error_cache
-
+import sys
 
 def evaluate_fitness(individuals,optimization=False):
     """
@@ -74,7 +74,10 @@ def evaluate_fitness(individuals,optimization=False):
 
             if eval_ind:
                 results = eval_or_append(ind, results, pool, optimization)
-
+        if optimization:
+            perc = stats['gen'] / (params['GENERATIONS'] + 1) * 100
+            #sys.stdout.write("\r Evolution: %d%% complete || Optimization  %d / %d \r" %(perc, name,len(individuals))) 
+            print("\r Evolution: %d%% complete || Optimization  %d / %d \r" %(perc, name,len(individuals)))  
     if params['MULTICORE']:
         for result in results:
             # Execute all jobs in the pool.

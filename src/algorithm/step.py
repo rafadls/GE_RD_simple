@@ -4,7 +4,7 @@ from operators.mutation import mutation
 from operators.replacement import replacement, steady_state
 from operators.selection import selection
 from stats.stats import get_stats
-
+import numpy as np
 
 def step(individuals,optimization=False):
     """
@@ -31,9 +31,10 @@ def step(individuals,optimization=False):
     # Evaluate the fitness of the new population.
     new_pop = evaluate_fitness(new_pop,optimization)
 
+
     # Replace the old population with the new population.
     individuals = replacement(new_pop, individuals)
-    
+
     # sort
     individuals.sort(reverse=True)
 
@@ -41,6 +42,22 @@ def step(individuals,optimization=False):
     get_stats(individuals)
 
     return individuals
+
+def count_checks(individuals):
+    count = 0
+    for ind in individuals:
+        if ind.check_result:
+            count+=1
+        else:
+            print(ind.check_result)
+    return count
+
+def count_invalid(individuals):
+    count = 0
+    for ind in individuals:
+        if ind.fitness == np.inf:
+            count+=1
+    print('Invalidos: ' + str(count) + '/' + str(len(individuals)))
 
 
 def steady_state_step(individuals):

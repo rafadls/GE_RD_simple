@@ -1,4 +1,4 @@
 COEFICIENTE,CROSSOVER_PROBABILITY,Correlation,GENERATIONS,MR,MUTATION_PROBABILITY,N_CELDAS,N_ROWS_CORR,N_ROWS_TRAIN,POPULATION_SIZE,check_minimum_fitness,crossover_tries,mutation_tries,optimizeConstant_each,Best fitness,Best phenotype,Total time
-1.0,0.75,1.0,100.0,1.0,0.15,53.0,100.0,1000.0,100.0,1.0,100.0,100.0,20.0,0.1437756709780648,"if_lower_else(Rem, 301.0,  Rem**((((-59.1 )  + 0)     / ((98.7 )*(An *Dfn *fluidColumn *S**5.5 ) + (-41.0 )*(An**3.0 )))), 1.5)",1853.7441446781158
+1.0,0.75,1.0,100.0,1.0,0.15,53.0,100.0,1000.0,100.0,1.0,100.0,100.0,20.0,0.1437756709780648,"if_lower_else(Rem, 301.0,  Rem**((((-59.1 )  + 0)     / ((98.7 )*(An *Dfn *fluidColumn *S**5.5 ) + (-41.0 )*(An**3.0 )))), 1.5)",2641.5785241127014
 2.0,0.75,1.0,100.0,1.0,0.15,53.0,100.0,1000.0,100.0,1.0,100.0,100.0,20.0,,,
 3.0,0.75,1.0,100.0,1.0,0.15,53.0,100.0,1000.0,100.0,1.0,100.0,100.0,20.0,,,

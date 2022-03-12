@@ -121,3 +121,62 @@ def get_all_data():
   data_74 = pd.read_csv(path + 'df_' + str(74) + text)
   data_102 = pd.read_csv(path + 'df_' + str(102) + text)
   return data_25, data_53, data_74, data_102
+
+
+def eval_all_data(fitness_function, phenotypes, coeficiente):
+  params['COEFICIENTE']=coeficiente
+  data_25, data_53, data_74, data_102 = get_all_data()
+  fitness_25_array, fitness_53_array, fitness_74_array, fitness_102_array = [], [], [], []
+  for phenotype in phenotypes:
+    ### 25 ####
+    fitness_function.data_in, fitness_function.target  =  data_25.iloc[:,:-1], data_25.iloc[:,-1].values
+    check_result, fitness_25 = fitness_function.fitness_stringPhenotype(phenotype)
+    fitness_25_array.append(fitness_25)
+    ### 53 ####
+    fitness_function.data_in, fitness_function.target  =  data_53.iloc[:,:-1], data_53.iloc[:,-1].values
+    check_result, fitness_53 = fitness_function.fitness_stringPhenotype(phenotype)
+    fitness_53_array.append(fitness_53)
+    ### 74 ####
+    fitness_function.data_in, fitness_function.target  =  data_74.iloc[:,:-1], data_74.iloc[:,-1].values
+    check_result, fitness_74 = fitness_function.fitness_stringPhenotype(phenotype)
+    fitness_74_array.append(fitness_74)
+    ### 102 ####
+    fitness_function.data_in, fitness_function.target  =  data_102.iloc[:,:-1], data_102.iloc[:,-1].values
+    check_result, fitness_102 = fitness_function.fitness_stringPhenotype(phenotype)
+    fitness_102_array.append(fitness_102)
+  return fitness_25_array, fitness_53_array, fitness_74_array, fitness_102_array
+
+
+
+def get_arrays(n_gen, index, mainPath):
+    fitness_array = []
+    n_valid_array = []
+    time_array = []
+    duplicated_array = []
+    phenotype_array = []
+    df_inicial = pd.read_excel(mainPath + '/results/'+ str(index) +'/savedPopulations/poblacionInicial.xls')
+    tiempo = df_inicial['Time'][0]
+    for i in range(1,n_gen+1):
+        nombre = 'generation_' + str(i) + '.xls'
+        df = pd.read_excel(mainPath + '/results/'+ str(index) +'/savedPopulations/' + nombre)
+        fitness_array.append(df['Fitness'].min())
+        n_valid_array.append(np.sum(df['Fitness'] != np.inf)*100/len(df['Fitness']))
+        time_array.append(df['Time'][0]-tiempo)
+        tiempo = df['Time'][0]
+        duplicated_array.append(np.sum(df[['Fenotipo']].duplicated()))
+        phenotype_array.append(df['Fenotipo'][0])
+    return fitness_array, n_valid_array, time_array, duplicated_array, phenotype_array
+
+
+def get_dataframes(df,columns_text, mainPath):
+  df_fitness = pd.DataFrame()
+  df_valid = pd.DataFrame()
+  df_time = pd.DataFrame()
+  df_duplicated = pd.DataFrame()
+  df_phenotype = pd.DataFrame()
+  for index, row in df.iterrows():
+      text = ''
+      for column in columns_text:
+          text = text + '(' + column + ':' + str(row[column]) + ') '
+      df_fitness[text], df_valid[text], df_time[text], df_duplicated[text], df_phenotype[text]  = get_arrays(int(row['GENERATIONS']), index, mainPath)
+  return df_fitness, df_valid, df_time, df_duplicated, df_phenotype

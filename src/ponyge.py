@@ -25,7 +25,7 @@ import numpy as np
 from utilities.stats.stats_in_excel import list2dic, saveGenerationAsExcel
 import shutil
 import matplotlib.pyplot as plt
-from fitness.funciones_fitness import eval_allData, get_data, check_correlation, check_minimum_fitness, get_all_data
+from fitness.funciones_fitness import eval_all_data, get_all_data, get_dataframes
 from fitness.fitness_modelo import fitness_modelo
 from representation import individual
 
@@ -123,41 +123,14 @@ def correrParametrosVarios(configurations):
     columns_text = [x for x in columns_text if x not in ['Best fitness', 'Best phenotype', 'Total time']]
 
     # EVOLUTION
-    def get_fitness_array(n_gen, index):
-        fitness_array = []
-        n_valid_array = []
-        time_array = []
-        duplicated_array = []
-        df_inicial = pd.read_excel(mainPath + '/results/'+ str(index) +'/savedPopulations/poblacionInicial.xls')
-        tiempo = df_inicial['Time'][0]
-        for i in range(1,n_gen+1):
-            nombre = 'generation_' + str(i) + '.xls'
-            df = pd.read_excel(mainPath + '/results/'+ str(index) +'/savedPopulations/' + nombre)
-            fitness_array.append(df['Fitness'].min())
-            n_valid_array.append(np.sum(df['Fitness'] != np.inf)*100/len(df['Fitness']))
-            time_array.append(df['Time'][0]-tiempo)
-            tiempo = df['Time'][0]
-            duplicated_array.append(np.sum(df[['Fenotipo']].duplicated()))
-        return fitness_array, n_valid_array, time_array, duplicated_array
+    df_fitness, df_valid, df_time, df_duplicated, df_phenotype = get_dataframes(df,columns_text, mainPath)
 
-    # EVOLUTION
-    df_fitness = pd.DataFrame()
-    df_valid = pd.DataFrame()
-    df_time = pd.DataFrame()
-    df_duplicated = pd.DataFrame()
-
-    for index, row in df.iterrows():
-        text = ''
-        for column in columns_text:
-            text = text + '(' + column + ':' + str(row[column]) + ') '
-        df_fitness[text], df_valid[text], df_time[text], df_duplicated[text]  = get_fitness_array(int(row['GENERATIONS']), index)
-
-    ###################   evolusion   #####################
+    ###################   evolution   #####################
     fig = plt.figure(figsize=(20,20))
     fig.suptitle('Evolution',fontsize=25) 
     #########
     ax1 = plt.subplot(3,1,1)
-    df_invalid.plot(ax=ax1)
+    df_valid.plot(ax=ax1)
     ax1.set_ylabel('Valid percentage')
     ax1.set_xlabel('Generations')
     ax1.set_title('Valid')
@@ -210,56 +183,22 @@ def correrParametrosVarios(configurations):
     plt.savefig(mainPath + '/Experiments/performance.png')
 
     ########################## Generalization ########################    
-    data_25, data_53, data_74, data_102 = get_all_data()
-
+    nrow=len(df)
+    ncol=1
+    fig, axes = plt.subplots(nrow, ncol, figsize=(20,nrow*5))
+    fig.suptitle('Generalization per configuration',fontsize=25)
     fitness_function = fitness_modelo()
-    text_array = []
-    array_25 = []
-    array_53 = []
-    array_74 = []
-    array_102 = []
     for index, row in df.iterrows():
-        phenotype = row['Best phenotype']
         text = ''
         for column in columns_text:
             text = text + '(' + column + ':' + str(row[column]) + ') '
-        
-        params['COEFICIENTE']=row['COEFICIENTE']
-        print(params['COEFICIENTE'])
-        data_25, data_53, data_74, data_102 = get_all_data()
-        ### 25 ####
-        fitness_function.data_in, fitness_function.target  =  data_25.iloc[:,:-1], data_25.iloc[:,-1].values
-        check_result, fitness_25 = fitness_function.fitness_stringPhenotype(phenotype)
-        print('fitness_25: ' + str(fitness_25))
-        ### 53 ####
-        fitness_function.data_in, fitness_function.target  =  data_53.iloc[:,:-1], data_53.iloc[:,-1].values
-        check_result, fitness_53 = fitness_function.fitness_stringPhenotype(phenotype)
-        print('fitness_53: ' + str(fitness_53))
-        ### 74 ####
-        fitness_function.data_in, fitness_function.target  =  data_74.iloc[:,:-1], data_74.iloc[:,-1].values
-        check_result, fitness_74 = fitness_function.fitness_stringPhenotype(phenotype)
-        print('fitness_74: ' + str(fitness_74))
-        ### 102 ####
-        fitness_function.data_in, fitness_function.target  =  data_102.iloc[:,:-1], data_102.iloc[:,-1].values
-        check_result, fitness_102 = fitness_function.fitness_stringPhenotype(phenotype)
-        print('fitness_102: ' + str(fitness_102))
-        text_array.append(text)
-        array_25.append(fitness_25)
-        array_53.append(fitness_53)
-        array_74.append(fitness_74)
-        array_102.append(fitness_102)
-    
-    fig = plt.figure(figsize=(12,12))
-    fig.suptitle('Generalization',fontsize=25)    
-    df_generalization = pd.DataFrame({'fitness 25 celdas': array_25,'fitness 53 celdas': array_53,'fitness 74 celdas': array_74,'fitness 102 celdas': array_102}, index=text_array)
-    ax = df_generalization.plot.bar(rot=0)
-    ax.set_ylabel('Fitness per distribution')
-    ax.set_xlabel('Configuration')
-    ax.set_yscale('log')
-    ax.set_title('Generalization')
+        print(text)
+        fitness_25_array, fitness_53_array, fitness_74_array, fitness_102_array = eval_all_data(fitness_function, df_phenotype[text], row['COEFICIENTE'])
+        df_generalization = pd.DataFrame({'fitness 25 celdas': fitness_25_array,'fitness 53 celdas': fitness_53_array,'fitness 74 celdas': fitness_74_array,'fitness 102 celdas': fitness_102_array})
+        df_generalization.plot(ax=axes[index])
+        axes[index].set_xlabel('Generations')
+        axes[index].set_ylabel('Fitness')
     plt.savefig(mainPath + '/Experiments/generalization.png')
-
-
 
 def mane():
     """ Run program """

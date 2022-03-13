@@ -198,6 +198,7 @@ def correrParametrosVarios(configurations):
         df_generalization.plot(ax=axes[index])
         axes[index].set_xlabel('Generations')
         axes[index].set_ylabel('Fitness')
+        axes[index].set_yscale('log')
     plt.savefig(mainPath + '/Experiments/generalization.png')
 
 def mane():

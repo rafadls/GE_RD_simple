@@ -25,7 +25,7 @@ def custom_optimize_constants2(x, y, ind, actualizeGenome=False):
         return fitness
 
     [best_result, best_constant, best_val_pos] = seudo_gradient_optimization(acc_values_int, lower_values_float, 
-        step_values_float, last_values_float, init, s, grad_calculations=2, grad_descendant=20)
+        step_values_float, last_values_float, init, s, grad_calculations=params['grad_calculations'], grad_descendant=params['grad_descendant'])
     ind.opt_consts = best_constant
 
     if actualizeGenome:

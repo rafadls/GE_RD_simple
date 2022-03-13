@@ -32,6 +32,8 @@ params = {
 
     # Optimización
     'smartConstant': True,
+    'grad_calculations': 2,
+    'grad_descendant': 20,
 
     'loss': mean_squared_error, 
     # explained_variance_score, max_error, mean_absolute_error, 

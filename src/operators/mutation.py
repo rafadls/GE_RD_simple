@@ -31,7 +31,8 @@ def mutation(pop):
         if params["MR"]:
             correct_check = False
             individuos_intentos = []
-            while len(individuos_intentos)<params['mutation_tries']:
+            mutation_tries = 0
+            while mutation_tries<params['mutation_tries']:
                 new_ind = params['MUTATION'](ind)
                 if new_ind.check_result and not (check_ind(new_ind, "mutation")):
                     correct_check = True
@@ -42,7 +43,10 @@ def mutation(pop):
             #print('intentos_de_mutacion: '  + str(intentos_de_mutacion))
             #print('len(individuos_intentos): '  + str(len(individuos_intentos)))
             if not correct_check:
-                new_ind = max(individuos_intentos)
+                if len(individuos_intentos)>0:
+                    new_ind = max(individuos_intentos)
+                else:
+                    new_ind = ind
         else:
             new_ind = params['MUTATION'](ind)
 

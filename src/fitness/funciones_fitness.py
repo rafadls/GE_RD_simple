@@ -1,3 +1,4 @@
+from distutils.command.build_scripts import first_line_re
 import numpy as np
 np.seterr(all="raise")
 
@@ -6,7 +7,7 @@ from utilities.fitness.optimize_constants import *
  
 import pandas as pd 
 from sklearn.metrics import explained_variance_score, max_error, mean_absolute_error, mean_squared_error, mean_squared_log_error, median_absolute_error, mean_absolute_percentage_error,r2_score,mean_poisson_deviance,mean_gamma_deviance, mean_tweedie_deviance, d2_tweedie_score, mean_pinball_loss 
-
+from fitness.ModeloBaterias.fitness_modelo_fenomenologico import fitness_modelo_fenomenologico
 
 
 def if_lower_else(a,b,c,d):
@@ -109,18 +110,18 @@ def get_data():
   return data.iloc[:,:-1], data.iloc[:,-1].values
 
 def get_all_data():
-  path = '../datasets/ModeloBaterias/'
-  if params['COEFICIENTE']==1:
-      text = '_cdrag.txt'
-  if params['COEFICIENTE']==2:
-      text = '_ff.txt'
-  if params['COEFICIENTE']==3:
-      text = '_n.txt'
-  data_25 = pd.read_csv(path + 'df_' + str(25) + text)
-  data_53 = pd.read_csv(path + 'df_' + str(53) + text)
-  data_74 = pd.read_csv(path + 'df_' + str(74) + text)
-  data_102 = pd.read_csv(path + 'df_' + str(102) + text)
-  return data_25, data_53, data_74, data_102
+    path = '../datasets/ModeloBaterias/'
+    if params['COEFICIENTE']==1:
+        text = '_cdrag.txt'
+    if params['COEFICIENTE']==2:
+        text = '_ff.txt'
+    if params['COEFICIENTE']==3:
+        text = '_n.txt'
+    data_25 = pd.read_csv(path + 'df_' + str(25) + text)
+    data_53 = pd.read_csv(path + 'df_' + str(53) + text)
+    data_74 = pd.read_csv(path + 'df_' + str(74) + text)
+    data_102 = pd.read_csv(path + 'df_' + str(102) + text)
+    return data_25, data_53, data_74, data_102
 
 
 def eval_all_data(fitness_function, phenotypes, coeficiente):
@@ -146,7 +147,29 @@ def eval_all_data(fitness_function, phenotypes, coeficiente):
     fitness_102_array.append(fitness_102)
   return fitness_25_array, fitness_53_array, fitness_74_array, fitness_102_array
 
+def eval_data(fitness_function, phenotype, coeficiente):
+  params['COEFICIENTE']=coeficiente
+  data_25, data_53, data_74, data_102 = get_all_data()
+  ### 25 ####
+  fitness_function.data_in, fitness_function.target  =  data_25.iloc[:,:-1], data_25.iloc[:,-1].values
+  check_result, fitness_25 = fitness_function.fitness_stringPhenotype(phenotype)
+  ### 53 ####
+  fitness_function.data_in, fitness_function.target  =  data_53.iloc[:,:-1], data_53.iloc[:,-1].values
+  check_result, fitness_53 = fitness_function.fitness_stringPhenotype(phenotype)
+  ### 74 ####
+  fitness_function.data_in, fitness_function.target  =  data_74.iloc[:,:-1], data_74.iloc[:,-1].values
+  check_result, fitness_74 = fitness_function.fitness_stringPhenotype(phenotype)
+  ### 102 ####
+  fitness_function.data_in, fitness_function.target  =  data_102.iloc[:,:-1], data_102.iloc[:,-1].values
+  check_result, fitness_102 = fitness_function.fitness_stringPhenotype(phenotype)
+  return fitness_25, fitness_53, fitness_74, fitness_102
 
+def eval_all_data_modeloFenomenologico(phenotype):
+  fitness_array = []
+  for num_celdas in [25,53,74,102]:
+    fitness_function = fitness_modelo_fenomenologico(num_celdas=num_celdas)
+    fitness_array.append(fitness_function.fitness_stringPhenotype(phenotype))
+  return fitness_array
 
 def get_arrays(n_gen, index, mainPath):
     fitness_array = []
@@ -180,3 +203,6 @@ def get_dataframes(df,columns_text, mainPath):
           text = text + '(' + column + ':' + str(row[column]) + ') '
       df_fitness[text], df_valid[text], df_time[text], df_duplicated[text], df_phenotype[text]  = get_arrays(int(row['GENERATIONS']), index, mainPath)
   return df_fitness, df_valid, df_time, df_duplicated, df_phenotype
+
+
+

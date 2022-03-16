@@ -16,85 +16,90 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+from fitness.funciones_fitness import eval_all_data, get_all_data, get_dataframes
+from fitness.fitness_modelo import fitness_modelo
+
 mainPath = os.path.abspath("..")
 
 # DATA
-df =  pd.read_csv(mainPath + '/Experiments/data.csv')
+df =  pd.read_csv(mainPath  + '/Experiments/data.csv')
 columns_text = df.nunique()
 columns_text = columns_text[columns_text>1]
 columns_text = list(columns_text.index)
 columns_text = [x for x in columns_text if x not in ['Best fitness', 'Best phenotype', 'Total time']]
 
 # EVOLUTION
-def get_fitness_array(n_gen, index):
-    fitness_array = []
-    n_invalid_array = []
-    time_array = []
-    df_inicial = pd.read_excel(mainPath + '/results/'+ str(index) +'/savedPopulations/poblacionInicial.xls')
-    tiempo = df_inicial['Time'][0]
-    for i in range(1,n_gen+1):
-        nombre = 'generation_' + str(i) + '.xls'
-        df = pd.read_excel(mainPath + '/results/'+ str(index) +'/savedPopulations/' + nombre)
-        fitness_array.append(df['Fitness'].min())
-        n_invalid_array.append(np.sum(df['Fitness'] != np.inf)*100/len(df['Fitness']))
-        time_array.append(df['Time'][0]-tiempo)
-        tiempo = df['Time'][0]
-    return fitness_array, n_invalid_array, time_array
+df_fitness, df_valid, df_time, df_duplicated, df_phenotype = get_dataframes(df,columns_text, mainPath)
 
-# EVOLUTION
-df_fitness = pd.DataFrame()
-df_invalid = pd.DataFrame()
-df_time = pd.DataFrame()
-
-for index, row in df.iterrows():
-    text = ''
-    for column in columns_text:
-        text = text + '(' + column + ':' + str(row[column]) + ') '
-    df_fitness[text], df_invalid[text], df_time[text]  = get_fitness_array(int(row['GENERATIONS']), index)
-
-
-
-fig = plt.figure(figsize=(30,20))
+###################   evolution   #####################
+fig = plt.figure(figsize=(15,15))
 fig.suptitle('Evolution',fontsize=25) 
 #########
-ax1 = plt.subplot(3,2,1)
+ax1 = plt.subplot(3,1,1)
+df_valid.plot(ax=ax1)
+ax1.set_ylabel('Valid percentage')
+ax1.set_xlabel('Generations')
+ax1.set_title('Valid individuals',fontsize=15)
+ax1.set_ylim(0, 100)
+#########
+ax2 = plt.subplot(3,1,2)
+df_time.plot(ax=ax2)
+ax2.set_ylabel('Time')
+ax2.set_xlabel('Generations')
+ax2.set_title('Time per generation',fontsize=15)
+######### 
+ax3 = plt.subplot(3,1,3)
+df_duplicated.plot(ax=ax3)
+ax3.set_ylabel('Duplicates')
+ax3.set_xlabel('Generations')
+ax3.set_title('Duplicateds per generation',fontsize=15)
+plt.savefig(mainPath + '/Experiments/evolution.png')
+
+###################   Performance   #####################
+
+fig = plt.figure(figsize=(15,15))
+fig.suptitle('Performance',fontsize=25) 
+#########
+ax1 = plt.subplot(2,1,1) # fig.add_axes([0,0.3,1,0.3])
 df_fitness.plot(ax=ax1)
 ax1.set_ylabel('Fitness')
 ax1.set_xlabel('Generations')
-ax1.set_title('Fitness')
+ax1.set_title('Fitness',fontsize=15)
 ########
-ax2 = plt.subplot(3,2,3)
-df_invalid.plot(ax=ax2)
-ax2.set_ylabel('Valid percentage')
-ax2.set_xlabel('Generations')
-ax2.set_title('Valid')
-########
-ax3 = plt.subplot(3,2,5)
-df_time.plot(ax=ax3)
-ax3.set_ylabel('Time')
-ax3.set_xlabel('Generations')
-ax3.set_title('Time per generation')
-########
-ax4 = plt.subplot(1,2,2)
+ax2 = plt.subplot(2,1,2) #fig.add_axes([0,1,1,0.6]) # [left, bottom, width, height]  
 x = df[['Best fitness']].values
 y = df[['Total time']].values
-ax4.scatter(x,y)
-ax4.set_yscale('log')
-ax4.set_xscale('log')
+ax2.scatter(x,y)
+ax2.set_yscale('log')
+ax2.set_xscale('log')
 for index, row in df.iterrows():
     text = ''
     for column in columns_text:
-        text = text + '(' + column + ':' + str(row[column]) + ') '
-    ax4.annotate(text, (row['Best fitness'], row['Total time']))  
-ax4.set_ylabel('Total time')
-ax4.set_xlabel('Best fitness')
-ax4.set_title('Performance')
-
-for index, row in df.iterrows():
-    text = ''
-    for column in columns_text:
-        text = text + '(' + column + ':' + str(row[column]) + ') '
-    ax4.annotate(text, (row['Best fitness'], row['Total time']))    
+        text = text + '(' + column + ':' + str(row[column]) + ')\n'
+    ax2.annotate(text, (row['Best fitness'], row['Total time']))  
+ax2.set_ylabel('Total time')
+ax2.set_xlabel('Best fitness')
+ax2.set_title('Performance',fontsize=15)
 
 ### Save multi plot
-plt.savefig(mainPath + '/Experiments/evolution.png')
+plt.savefig(mainPath + '/Experiments/performance.png')
+'''
+########################## Generalization ########################    
+nrow=len(df)
+ncol=1
+fig, axes = plt.subplots(nrow, ncol, figsize=(20,nrow*5))
+fig.suptitle('Generalization per configuration',fontsize=25)
+fitness_function = fitness_modelo()
+for index, row in df.iterrows():
+    text = ''
+    for column in columns_text:
+        text = text + '(' + column + ':' + str(row[column]) + ') '
+    print(text)
+    fitness_25_array, fitness_53_array, fitness_74_array, fitness_102_array = eval_all_data(fitness_function, df_phenotype[text], row['COEFICIENTE'])
+    df_generalization = pd.DataFrame({'fitness 25 celdas': fitness_25_array,'fitness 53 celdas': fitness_53_array,'fitness 74 celdas': fitness_74_array,'fitness 102 celdas': fitness_102_array})
+    df_generalization.plot(ax=axes[index])
+    axes[index].set_xlabel('Generations')
+    axes[index].set_ylabel('Fitness')
+    axes[index].set_yscale('log')
+plt.savefig(mainPath + '/Experiments/generalization.png')
+'''

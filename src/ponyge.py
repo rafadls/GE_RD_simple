@@ -126,37 +126,38 @@ def correrParametrosVarios(configurations):
     df_fitness, df_valid, df_time, df_duplicated, df_phenotype = get_dataframes(df,columns_text, mainPath)
 
     ###################   evolution   #####################
-    fig = plt.figure(figsize=(20,20))
+    fig = plt.figure(figsize=(15,15))
     fig.suptitle('Evolution',fontsize=25) 
     #########
     ax1 = plt.subplot(3,1,1)
     df_valid.plot(ax=ax1)
     ax1.set_ylabel('Valid percentage')
     ax1.set_xlabel('Generations')
-    ax1.set_title('Valid')
+    ax1.set_title('Valid individuals',fontsize=15)
     #########
     ax2 = plt.subplot(3,1,2)
     df_time.plot(ax=ax2)
     ax2.set_ylabel('Time')
     ax2.set_xlabel('Generations')
-    ax2.set_title('Time per generation')
+    ax2.set_title('Time per generation',fontsize=15)
     ######### 
     ax3 = plt.subplot(3,1,3)
     df_duplicated.plot(ax=ax3)
     ax3.set_ylabel('Duplicates')
     ax3.set_xlabel('Generations')
-    ax3.set_title('Duplicateds per generation')
+    ax3.set_title('Duplicateds per generation',fontsize=15)
     plt.savefig(mainPath + '/Experiments/evolution.png')
 
     ###################   Performance   #####################
-    fig = plt.figure(figsize=(20,20))
+
+    fig = plt.figure(figsize=(15,15))
     fig.suptitle('Performance',fontsize=25) 
     #########
     ax1 = plt.subplot(2,1,1) # fig.add_axes([0,0.3,1,0.3])
     df_fitness.plot(ax=ax1)
     ax1.set_ylabel('Fitness')
     ax1.set_xlabel('Generations')
-    ax1.set_title('Fitness')
+    ax1.set_title('Fitness',fontsize=15)
     ########
     ax2 = plt.subplot(2,1,2) #fig.add_axes([0,1,1,0.6]) # [left, bottom, width, height]  
     x = df[['Best fitness']].values
@@ -171,7 +172,7 @@ def correrParametrosVarios(configurations):
         ax2.annotate(text, (row['Best fitness'], row['Total time']))  
     ax2.set_ylabel('Total time')
     ax2.set_xlabel('Best fitness')
-    ax2.set_title('Performance')
+    ax2.set_title('Performance',fontsize=15)
 
     for index, row in df.iterrows():
         text = ''

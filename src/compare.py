@@ -33,8 +33,8 @@ except:
 ###### FITNESS COEFICIENTES ######
 nrow=3
 ncol=1
-fig, axes = plt.subplots(nrow, ncol, figsize=(20,15))
-fig.suptitle('Comparation of individuals',fontsize=25)
+fig, axes = plt.subplots(nrow, ncol, figsize=(15,15))
+fig.suptitle('Comparación de individuos',fontsize=25)
 df_cdrag = pd.DataFrame()
 df_ff = pd.DataFrame()
 df_n= pd.DataFrame()
@@ -57,20 +57,23 @@ df_ff = df_ff[['fitness 25 celdas','fitness 53 celdas','fitness 74 celdas','fitn
 df_n = df_n[['fitness 25 celdas','fitness 53 celdas','fitness 74 celdas','fitness 102 celdas']]
 
 df_cdrag.plot.bar(rot=0, ax=axes[0])
+axes[0].set_title('Coeficiente de arrastre',fontsize=15)
 axes[0].set_xlabel('Individuals')
-axes[0].set_ylabel('Fitness Cdrag')
+axes[0].set_ylabel('Fitness')
 axes[0].set_yscale('log')
 
 
 df_ff.plot.bar(rot=0, ax=axes[1])
+axes[1].set_title('Factor de fricción',fontsize=15)
 axes[1].set_xlabel('Individuals')
-axes[1].set_ylabel('Fitness Cdrag')
+axes[1].set_ylabel('Fitness')
 axes[1].set_yscale('log')
 
 
 df_n.plot.bar(rot=0, ax=axes[2])
+axes[2].set_title('Número de Nusselt',fontsize=15)
 axes[2].set_xlabel('Individuals')
-axes[2].set_ylabel('Fitness Cdrag')
+axes[2].set_ylabel('Fitness')
 axes[2].set_yscale('log')
 
 plt.savefig(path_compare + 'coeficientes.png')

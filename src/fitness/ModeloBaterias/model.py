@@ -325,14 +325,11 @@ class ParametricModel(BaseModel):
             point ([dict]): [description]
             individuals ([type]): [description]
         """
-
         cons = self.estimate_initial_conditions(point)
         dynamics = self.get_dynamics_vars(point, cons)
         errors = self.get_error_container()
-
         for _ in range(self.fluodynamics_iterations):
             self.initial_states(cons, dynamics, errors, point, individuals)
-
             for idx in range(self.col_fluid - 1):
                 self.evolve_states(
                     idx, cons, dynamics, errors, point, individuals

@@ -7,7 +7,7 @@ from utilities.fitness.optimize_constants import *
  
 import pandas as pd 
 from sklearn.metrics import explained_variance_score, max_error, mean_absolute_error, mean_squared_error, mean_squared_log_error, median_absolute_error, mean_absolute_percentage_error,r2_score,mean_poisson_deviance,mean_gamma_deviance, mean_tweedie_deviance, d2_tweedie_score, mean_pinball_loss 
-from fitness.ModeloBaterias.fitness_modelo_fenomenologico import fitness_modelo_fenomenologico
+from fitness.ModeloBaterias.fitness_modelo_java import fitness_modelo_java
 
 
 def if_lower_else(a,b,c,d):
@@ -167,8 +167,10 @@ def eval_data(fitness_function, phenotype, coeficiente):
 def eval_all_data_modeloFenomenologico(phenotype):
   fitness_array = []
   for num_celdas in [25,53,74,102]:
-    fitness_function = fitness_modelo_fenomenologico(num_celdas=num_celdas)
-    fitness_array.append(fitness_function.fitness_stringPhenotype(phenotype))
+    params["num_celdas"] = num_celdas
+    fitness_function = fitness_modelo_java()
+    fitness = fitness_function.fitness_stringPhenotype(phenotype)
+    fitness_array.append(fitness)
   return fitness_array
 
 def get_arrays(n_gen, index, mainPath):

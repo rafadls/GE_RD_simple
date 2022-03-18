@@ -5,14 +5,13 @@ import os
 import itertools
 import subprocess
 import pandas as pd
+import numpy as np
 import shutil
 import matplotlib.pyplot as plt
+import math
 
 
-from fitness.ModeloBaterias.fitness_modelo_fenomenologico import fitness_modelo_fenomenologico
-#from fitness.ModeloBaterias.funciones_modelo_fenomenologico import 
-from fitness.fitness_modelo import fitness_modelo
-from fitness.funciones_fitness import eval_all_data, get_all_data, get_dataframes, eval_all_data_modeloFenomenologico, eval_data
+from fitness.funciones_fitness import eval_all_data_modeloFenomenologico
 
 # Se obtiene el path relativo
 mainPath = os.path.abspath("..")
@@ -31,6 +30,7 @@ except:
     pass
 
 ###### FITNESS COEFICIENTES ######
+'''
 nrow=3
 ncol=1
 fig, axes = plt.subplots(nrow, ncol, figsize=(15,15))
@@ -77,11 +77,23 @@ axes[2].set_ylabel('Fitness')
 axes[2].set_yscale('log')
 
 plt.savefig(path_compare + 'coeficientes.png')
-
-###### FITNESS SALIDAS ######
 '''
+###### FITNESS SALIDAS ######
+df_25 = pd.DataFrame()
+df_53 = pd.DataFrame()
+df_74 = pd.DataFrame()
+df_102 = pd.DataFrame()
+dfs = [df_25,df_53,df_74,df_102]
 for index, row in df.iterrows():
     name = row['Name']
     phtnotype = str(row['cdrag']) + ";" + str(row['ffactor']) + ";" +str(row['nusselt'])
-    print(eval_all_data_modeloFenomenologico(phtnotype))
-'''
+    fitness_25,fitness_53,fitness_74,fitness_102 =  eval_all_data_modeloFenomenologico(phtnotype)
+    if np.any(np.isinf(fitness_25)) or np.any(np.isinf(fitness_53)) or np.any(np.isinf(fitness_74)) or np.any(np.isinf(fitness_102)):
+        continue
+    fitness_array = [fitness_25,fitness_53,fitness_74,fitness_102]
+    for i in range(4):
+        dfs[i][name + '_VF'] = fitness_array[i][0,:]
+        dfs[i][name + '_PF'] = fitness_array[i][1,:]
+        dfs[i][name + '_TC'] = fitness_array[i][2,:]
+
+print(df_53)

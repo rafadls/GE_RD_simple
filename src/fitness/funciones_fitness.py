@@ -8,7 +8,7 @@ from utilities.fitness.optimize_constants import *
 import pandas as pd 
 from sklearn.metrics import explained_variance_score, max_error, mean_absolute_error, mean_squared_error, mean_squared_log_error, median_absolute_error, mean_absolute_percentage_error,r2_score,mean_poisson_deviance,mean_gamma_deviance, mean_tweedie_deviance, d2_tweedie_score, mean_pinball_loss 
 from fitness.ModeloBaterias.fitness_modelo_java import fitness_modelo_java
-
+import matplotlib.pyplot as plt
 
 def if_lower_else(a,b,c,d):
   if a<=b:
@@ -172,6 +172,48 @@ def eval_all_data_modeloFenomenologico(phenotype):
     fitness = fitness_function.fitness_stringPhenotype(phenotype)
     fitness_array.append(fitness)
   return fitness_array
+
+
+def get_data_outputs(df):
+  df_outputs = []
+  for output in ["VF",'PF','TC']:
+    df_output = df.filter(regex=(output))
+    columns = df_output.columns
+    for column in columns:
+      new_column = column.split('_')[0]
+      df_output = df_output.rename(columns={column: new_column})
+    df_outputs.append(df_output)
+  return df_outputs
+
+
+
+def save_graph_data_outputs(df, num_celdas, path_to_save):
+  df_vf,df_pf,df_tc = get_data_outputs(df)
+  nrow=3
+  ncol=1
+  fig, axes = plt.subplots(nrow, ncol,figsize=(15,nrow*8))
+  fig.suptitle('Comparación de individuos para ' + str(num_celdas) + ' celdas',fontsize=25)
+
+  df_vf.plot(rot=0, ax=axes[0])
+  axes[0].set_title('Error en cálculo de velocidad de fluido para por columna',fontsize=15)
+  axes[0].set_xlabel('Columnas')
+  axes[0].set_ylabel('Error')
+  axes[0].set_yscale('log')
+
+
+  df_pf.plot(rot=0, ax=axes[1])
+  axes[1].set_title('Error en cálculo de presión de fluido para por columna',fontsize=15)
+  axes[1].set_xlabel('Columnas')
+  axes[1].set_ylabel('Error')
+  axes[1].set_yscale('log')
+
+
+  df_tc.plot(rot=0, ax=axes[2])
+  axes[2].set_title('Error en cálculo de temperatura de celda para por columna',fontsize=15)
+  axes[2].set_xlabel('Columnas')
+  axes[2].set_ylabel('Error')
+  axes[2].set_yscale('log')
+  plt.savefig(path_to_save + 'individuals_comparation_' + str(num_celdas) + '_cells.png')
 
 def get_arrays(n_gen, index, mainPath):
     fitness_array = []

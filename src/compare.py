@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import math
 
 
-from fitness.funciones_fitness import eval_all_data_modeloFenomenologico
+from fitness.funciones_fitness import eval_all_data_modeloFenomenologico, save_graph_data_outputs
 
 # Se obtiene el path relativo
 mainPath = os.path.abspath("..")
@@ -84,16 +84,21 @@ df_53 = pd.DataFrame()
 df_74 = pd.DataFrame()
 df_102 = pd.DataFrame()
 dfs = [df_25,df_53,df_74,df_102]
+ns_celdas = [25,53,74,102]
+
+
 for index, row in df.iterrows():
     name = row['Name']
+    print(name)
     phtnotype = str(row['cdrag']) + ";" + str(row['ffactor']) + ";" +str(row['nusselt'])
     fitness_25,fitness_53,fitness_74,fitness_102 =  eval_all_data_modeloFenomenologico(phtnotype)
     if np.any(np.isinf(fitness_25)) or np.any(np.isinf(fitness_53)) or np.any(np.isinf(fitness_74)) or np.any(np.isinf(fitness_102)):
         continue
     fitness_array = [fitness_25,fitness_53,fitness_74,fitness_102]
-    for i in range(4):
+    for i in range(len(dfs)):
         dfs[i][name + '_VF'] = fitness_array[i][0,:]
         dfs[i][name + '_PF'] = fitness_array[i][1,:]
         dfs[i][name + '_TC'] = fitness_array[i][2,:]
 
-print(df_53)
+for i in range(len(dfs)):
+    save_graph_data_outputs(dfs[i], ns_celdas[i], path_compare)

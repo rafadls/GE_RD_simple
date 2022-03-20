@@ -1,4 +1,4 @@
-<start>     ::= if_lower_else(Rem, c[<80,1000>], <exp0>, c[<0.5,1.5>])
+<start>     ::= <exp0>
 
 <exp0>      ::= <factorSS> Rem^(<factorS>)             |
                 (<factorS>)*Rem <factorSS>             |

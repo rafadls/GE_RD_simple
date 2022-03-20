@@ -149,7 +149,13 @@ def get_list_vf_pf_tc(matrix_error):
 
 def fit_to_cells(matrix_error):
     matrix_error_np = np.asarray(matrix_error)
+    if np.any(np.isinf(matrix_error_np)):
+      print('matiz de error tiene infinitos')
+    if np.any(np.isnan(matrix_error_np)):
+      print('matiz de error tiene nulos')
+    #print(matrix_error_np.shape)
     matrix_error_celdas = matrix_error_np.mean(axis=0)
+    #print(matrix_error_celdas)
     return matrix_error_celdas
 
 
@@ -306,9 +312,6 @@ def create_array_result(df):
     df_vf = df_vf.reindex(sorted(df_vf.columns), axis=1)
     df_pf = df.filter(regex=("P+\d"))
     df_pf = df_pf.reindex(sorted(df_pf.columns), axis=1)
-    # print(df_pf.to_numpy())
-    #print(df_pf.to_numpy() - df_pf.to_numpy()[:,-1])
-    # print(df_pf.to_numpy()[:,:-1])
     df_tc = df.filter(regex=("TC+\d"))
     df_tc = df_tc.reindex(sorted(df_tc.columns), axis=1)
 

@@ -1,4 +1,4 @@
-# GE_RD_simple
+# **GE_RD_simple**
 
 ## **Instalation and run**
 
@@ -99,12 +99,14 @@ To set the individuals to compare edit the "/datasets/Compare/individuals.csv" f
 
 The code compare the individuals in the csv file by their fitness. 
 
-**Direct Performance**
+**Direct Performance** 
+
 Based on the error between the coefficient; Cgrad, ff, Nusselt
 
 ![Performance comparison](DEMO/coeficientes.png)
 
 **Indirect Performance**
+
 Based on the error between the model's output, velocity, pressure and temperature.  
 
 ![Performance comparison](DEMO/individuals_comparation_102_cells.png)

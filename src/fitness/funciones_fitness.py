@@ -185,7 +185,77 @@ def get_data_outputs(df):
     df_outputs.append(df_output)
   return df_outputs
 
+######################## CURVAS #######################
 
+def df_from_output(numpy_array):
+  string_array = ['V', 'P', 'TC']
+  df_salidas = pd.DataFrame()
+  print(numpy_array.shape)
+  for i in range(3):
+    data = numpy_array[:,i,:]
+    for j in range(data.shape[1]):
+      if j+1<10:
+        j_s = '0' + str(j+1)
+      else:
+        j_s = str(j+1)
+      df_salidas[string_array[i] + j_s] = data[:,j]
+  return df_salidas
+
+def get_df_to_plot(df,var1,var2):
+  col_inputs = ['Current', 'K', 'Flujo', 't_viento', 'Diametro']
+  df_aux = pd.concat([df[col_inputs],df.filter(regex=(var2 + "+\d")) ],axis=1)
+  col_inputs.remove(var1)
+  dir_base_values = dict(df.groupby(by=col_inputs).size().reset_index().rename(columns={0:'records'}).sort_values(by=['records'],ascending=False).reset_index(drop=True).iloc[0,:])
+  for col in col_inputs:
+    df_aux = df_aux[ df_aux[col]==dir_base_values[col]]
+  df_aux.drop(columns=col_inputs, inplace=True)
+  df_aux.reset_index(drop=True,inplace=True)
+  return df_aux
+
+def get_dataFrame(path_to_file):
+  data = pd.read_csv(path_to_file, header=6)
+  colCoded = data.columns.tolist()
+  nameCode = pd.read_csv(path_to_file, header=3,nrows=1)
+  colName = [[col.replace(d+' - ','') for i,col in enumerate(nameCode) if re.search(d, col)] for d in colCoded]
+  colName = [temp[0] if temp else 'Name' for temp in colName]
+  colName = [temp if (' ' not in temp) else temp[:temp.index(' ')] for temp in colName]
+  data.rename(columns=dict(zip(colCoded, colName)), inplace=True)
+  data.dropna(inplace=True)
+  data.drop_duplicates(inplace=True)
+  return data
+
+
+def get_data_simple(df):
+  df_output = df[['Current', 'K', 'Flujo', 't_viento', 'Diametro']]
+  for string in ['V','P','TC', 'cdrag','frictionFactor', 'nusselt']:
+    if string=='TC':
+      df_aux = df.filter(regex=(string + "+\d")) - 273.15
+    else:
+      df_aux = df.filter(regex=(string + "+\d"))
+    df_output = pd.concat([df_output,df_aux], axis=1)
+  df_output = df_output[ df_output['Flujo'] > 10]
+  df_output.reset_index(drop=True,inplace=True)
+  return df_output
+
+
+def compare(input, dataset_array, individuals_array, path_to_folder):
+  n_individuals = len(individuals_array)
+  fig, axis = plt.subplots(n_individuals, 3, figsize=(25,n_individuals*7))
+  fig.suptitle('Comparación de individuos en cuanto a: ' + input ,fontsize=25)
+  output_array = ['V', 'P', 'TC']
+  for i in range(len(dataset_array)):
+    for j in range(len(output_array)):
+      df_i_vs_o = get_df_to_plot(dataset_array[i],input,output_array[j])
+      columns_to_plot = list(df_i_vs_o.columns)
+      columns_to_plot.remove(input)
+      df_i_vs_o.plot(x=input, y=columns_to_plot, ax=axis[i,j])
+      if j==1:
+        axis[i,j].set_title(individuals_array[i],fontsize=20)
+      axis[i,j].set_xlabel(input)
+      axis[i,j].set_ylabel(output_array[j])
+  plt.savefig(path_to_folder + input + '.png')
+
+#######################################################
 
 def save_graph_data_outputs(df, num_celdas, path_to_save):
   df_vf,df_pf,df_tc = get_data_outputs(df)

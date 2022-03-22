@@ -10,8 +10,11 @@ import shutil
 import matplotlib.pyplot as plt
 import math
 
-
+from algorithm.parameters import params
 from fitness.funciones_fitness import eval_all_data_modeloFenomenologico, save_graph_data_outputs
+from fitness.funciones_fitness import df_from_output, get_df_to_plot, get_dataFrame, get_data_simple, compare
+from fitness.ModeloBaterias.fitness_modelo_java import fitness_modelo_java
+from fitness.ModeloBaterias.funcionesEvaluar_ModeloJava import *
 
 # Se obtiene el path relativo
 mainPath = os.path.abspath("..")
@@ -30,6 +33,7 @@ except:
     pass
 
 ###### FITNESS COEFICIENTES ######
+#print('FITNESS COEFICIENTES')
 '''
 nrow=3
 ncol=1
@@ -79,13 +83,13 @@ axes[2].set_yscale('log')
 plt.savefig(path_compare + 'coeficientes.png')
 '''
 ###### FITNESS SALIDAS ######
+print('FITNESS SALIDAS')
 df_25 = pd.DataFrame()
 df_53 = pd.DataFrame()
 df_74 = pd.DataFrame()
 df_102 = pd.DataFrame()
 dfs = [df_25,df_53,df_74,df_102]
 ns_celdas = [25,53,74,102]
-
 
 for index, row in df.iterrows():
     name = row['Name']
@@ -102,3 +106,34 @@ for index, row in df.iterrows():
 
 for i in range(len(dfs)):
     save_graph_data_outputs(dfs[i], ns_celdas[i], path_compare)
+
+######### CURVAS ###########
+print('CURVAS')
+dataset_output_array = []
+individuals_array = []
+
+
+data_in  = pd.read_csv("../datasets/ModeloFenomenologicoBaterias/" + str(102) +"_in.txt", sep=' ')
+data_out = pd.read_csv("../datasets/ModeloFenomenologicoBaterias/" + str(102) +"_out.txt", sep=' ')
+df_ansys = pd.concat([data_in,data_out], axis=1)
+
+dataset_output_array.append(df_ansys)
+individuals_array.append('ANSYS')
+
+for index, row in df.iterrows():
+    name = row['Name']
+    print(name)
+    try:
+        modelResult = eval_allData_multicore(data_in, [str(row['cdrag']),str(row['ffactor']),str(row['nusselt'])])
+        modelResult = np.asarray(modelResult)
+        if (not np.any(np.isinf(modelResult))) and (not np.any(np.isnan(modelResult))):
+            df_output = df_from_output(modelResult)
+            df_output = pd.concat([data_in,df_output], axis=1)
+            dataset_output_array.append(df_output)
+            individuals_array.append(name)
+    except Exception as e:
+        print(e)
+
+for column in ['Current', 'K', 'Flujo', 't_viento', 'Diametro']:
+    compare(column, dataset_output_array, individuals_array, path_compare)
+

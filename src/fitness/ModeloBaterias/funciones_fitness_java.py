@@ -319,7 +319,7 @@ def create_array_result(df):
     for i in range(len(df_vf.index)):
         vf_values = df_vf.iloc[i,:]
         pf_values = df_pf.iloc[i,:]-df_pf.iloc[i,-1]
-        tc_values = df_tc.iloc[i,:]-273.15
+        tc_values = df_tc.iloc[i,:]
         target.append([vf_values.values[1:], pf_values.values[:-1], tc_values.values])
     return target
 

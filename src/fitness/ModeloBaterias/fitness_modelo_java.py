@@ -76,6 +76,8 @@ class fitness_modelo_java(base_ff):
         final_trees = deepcopy(phenotype.split(";"))
         try: 
             modelResult = eval_allData_multicore(self.data_in, final_trees)
+            with open('/home/rafael/Tesis/test.npy', 'wb') as f:
+                np.save(f, modelResult)
             result_is_invalid = check_invalid_result(modelResult)
             if result_is_invalid:
                 fitness_calculado = math.inf

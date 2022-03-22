@@ -241,7 +241,7 @@ def get_data_simple(df):
 def compare(input, dataset_array, individuals_array, path_to_folder):
   n_individuals = len(individuals_array)
   fig, axis = plt.subplots(n_individuals, 3, figsize=(25,n_individuals*7))
-  fig.suptitle('Comparación de individuos en cuanto a: ' + input ,fontsize=25)
+  fig.suptitle('Comparación de individuos en cuanto a: ' + input ,fontsize=30)
   output_array = ['V', 'P', 'TC']
   for i in range(len(dataset_array)):
     for j in range(len(output_array)):
@@ -250,9 +250,9 @@ def compare(input, dataset_array, individuals_array, path_to_folder):
       columns_to_plot.remove(input)
       df_i_vs_o.plot(x=input, y=columns_to_plot, ax=axis[i,j])
       if j==1:
-        axis[i,j].set_title(individuals_array[i],fontsize=20)
-      axis[i,j].set_xlabel(input)
-      axis[i,j].set_ylabel(output_array[j])
+        axis[i,j].set_title(individuals_array[i],fontsize=25)
+      axis[i,j].set_xlabel(input, fontsize=20)
+      axis[i,j].set_ylabel(output_array[j],fontsize=20)
   plt.savefig(path_to_folder + input + '.png')
 
 #######################################################
@@ -262,27 +262,22 @@ def save_graph_data_outputs(df, num_celdas, path_to_save):
   nrow=3
   ncol=1
   fig, axes = plt.subplots(nrow, ncol,figsize=(15,nrow*8))
-  fig.suptitle('Comparación de individuos para ' + str(num_celdas) + ' celdas',fontsize=25)
+  fig.suptitle('Comparación de individuos para ' + str(num_celdas) + ' celdas',fontsize=30)
 
   df_vf.plot(rot=0, ax=axes[0])
-  axes[0].set_title('Error en cálculo de velocidad de fluido para por columna',fontsize=15)
-  axes[0].set_xlabel('Columnas')
-  axes[0].set_ylabel('Error')
-  axes[0].set_yscale('log')
-
+  axes[0].set_title('Error en cálculo de velocidad de fluido para por columna',fontsize=25)
+  axes[0].set_xlabel('Columnas',fontsize=20)
+  axes[0].set_ylabel('Error',fontsize=20)
 
   df_pf.plot(rot=0, ax=axes[1])
-  axes[1].set_title('Error en cálculo de presión de fluido para por columna',fontsize=15)
-  axes[1].set_xlabel('Columnas')
-  axes[1].set_ylabel('Error')
-  axes[1].set_yscale('log')
-
+  axes[1].set_title('Error en cálculo de presión de fluido para por columna',fontsize=25)
+  axes[1].set_xlabel('Columnas',fontsize=20)
 
   df_tc.plot(rot=0, ax=axes[2])
-  axes[2].set_title('Error en cálculo de temperatura de celda para por columna',fontsize=15)
-  axes[2].set_xlabel('Columnas')
-  axes[2].set_ylabel('Error')
-  axes[2].set_yscale('log')
+  axes[2].set_title('Error en cálculo de temperatura de celda para por columna',fontsize=25)
+  axes[2].set_xlabel('Columnas',fontsize=20)
+  axes[2].set_ylabel('Error',fontsize=20)
+
   plt.savefig(path_to_save + 'individuals_comparation_' + str(num_celdas) + '_cells.png')
 
 def get_arrays(n_gen, index, mainPath):

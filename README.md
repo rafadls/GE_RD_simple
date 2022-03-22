@@ -1,4 +1,4 @@
-# GE_RD_simple
+# **GE_RD_simple**
 
 ## **Instalation and run**
 
@@ -97,9 +97,17 @@ To set the individuals to compare edit the "/datasets/Compare/individuals.csv" f
 |Francisco Born    |0.8905 * An - 0.9997 * An ^ 2 + Rem ^ 0.1452                                                                           |Dfn ^ (2.5175 * Rem ^ (-0.1006)) * S ^ (22.7098 * Rem ^ (-0.3774) -2.0218)            |1.9324 * Rem ^ 0.5577 + 1                |
 |Rafael De La Sotta|if_lower_else(Rem, 113.0, ((((colIndex  )  + 0)     / ((S  )  + (Dfn^8.7*fluidColumn^1.4*colIndex^0.9 ) )))*Rem , 1.5)|((((3.5 )*(Rem^-0.5*Dfn^-1.9*S^-2.7*colIndex  ) + (3.1 )*(Dfn^-3.5*S^-1.0 ))  / (1)))|(0.14)*(Rem^(0.7438))*(Prandtl^(0.7068))|
 
-The code compare the individuals in the csv file
+The code compare the individuals in the csv file by their fitness. 
+
+**Direct Performance** 
+
+Based on the error between the coefficient; Cgrad, ff, Nusselt
 
 ![Performance comparison](DEMO/coeficientes.png)
 
+**Indirect Performance**
 
+Based on the error between the model's output, velocity, pressure and temperature.  
+
+![Performance comparison](DEMO/individuals_comparation_102_cells.png)
 

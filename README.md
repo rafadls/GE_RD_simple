@@ -111,3 +111,10 @@ Based on the error between the model's output, velocity, pressure and temperatur
 
 ![Performance comparison](DEMO/individuals_comparation_102_cells.png)
 
+**Physics Performance**
+
+Based on the relation between the inputs and the outputs. This relatino is seen as courves.
+
+![Physics Performance: Current](DEMO/Current.png)
+
+![Physics Performance: K](DEMO/K.png)

@@ -31,10 +31,6 @@ class fitness_modelo(base_ff):
 
     def evaluate(self, ind, **kwargs):
         optimize = kwargs['optimization']
-
-        #if ind.phenotype in cache.keys() and not optimize:
-        #    return True, cache[ind.phenotype]
-        
         if optimize:
             custom_optimize_constants2(self.data_in, self.target, ind, actualizeGenome=True)    
         else:
@@ -70,6 +66,6 @@ class fitness_modelo(base_ff):
             else:
                 return True, fitness_calculado
         except Exception as e:
-            #print(e)
+            print(e)
             return False, math.inf
 

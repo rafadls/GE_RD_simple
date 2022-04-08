@@ -11,10 +11,11 @@ import matplotlib.pyplot as plt
 import math
 
 from algorithm.parameters import params
-from fitness.funciones_fitness import eval_all_data_modeloFenomenologico, save_graph_data_outputs
-from fitness.funciones_fitness import df_from_output, get_df_to_plot, get_dataFrame, get_data_simple, compare
+from fitness.funciones_fitness import eval_allData , eval_all_data_modeloFenomenologico, save_graph_data_outputs
+from fitness.funciones_fitness import df_from_output, get_df_to_plot, get_dataFrame, get_data_simple, compare, eval_data
+from fitness.ModeloBaterias.funcionesEvaluar_ModeloJava import eval_allData_multicore
 from fitness.ModeloBaterias.fitness_modelo_java import fitness_modelo_java
-from fitness.ModeloBaterias.funcionesEvaluar_ModeloJava import *
+from fitness.fitness_modelo import fitness_modelo
 
 # Se obtiene el path relativo
 mainPath = os.path.abspath("..")
@@ -33,8 +34,16 @@ except:
     pass
 
 ###### FITNESS COEFICIENTES ######
+
+df = 
+exp = 
+eval_allData
+
+
+
+
 #print('FITNESS COEFICIENTES')
-'''
+
 nrow=3
 ncol=1
 fig, axes = plt.subplots(nrow, ncol, figsize=(15,15))
@@ -64,24 +73,21 @@ df_cdrag.plot.bar(rot=0, ax=axes[0])
 axes[0].set_title('Coeficiente de arrastre',fontsize=15)
 axes[0].set_xlabel('Individuals')
 axes[0].set_ylabel('Fitness')
-axes[0].set_yscale('log')
 
 
 df_ff.plot.bar(rot=0, ax=axes[1])
 axes[1].set_title('Factor de fricción',fontsize=15)
 axes[1].set_xlabel('Individuals')
 axes[1].set_ylabel('Fitness')
-axes[1].set_yscale('log')
 
 
 df_n.plot.bar(rot=0, ax=axes[2])
 axes[2].set_title('Número de Nusselt',fontsize=15)
 axes[2].set_xlabel('Individuals')
 axes[2].set_ylabel('Fitness')
-axes[2].set_yscale('log')
 
 plt.savefig(path_compare + 'coeficientes.png')
-'''
+
 ###### FITNESS SALIDAS ######
 print('FITNESS SALIDAS')
 df_25 = pd.DataFrame()

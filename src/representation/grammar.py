@@ -194,49 +194,6 @@ class Grammar(object):
                             params['CODON_SIZE'] = len(possible_values)
                         
                         continue
-                    """
-                    GE_constants_regex = r'GE_constants:(?P<range>\w*)'
-                    matching = match(GE_constants_regex, p.group('production'))
-                    if matching:
-                        try:
-                            max_constant = int(matching.group('range'))
-                        except (ValueError, AttributeError):
-                            raise ValueError("Bad use of GE_constants: "
-                                             + matching.group())
-                        possible_values = np.arange(0, max_constant+0.0001, 0.0001)
-                        #new_param = file_name.split("/")[-1].split(".")[0]+"_dict"
-                        #new_param2 = file_name.split("/")[-1].split(".")[0]+"_max_constant"
-                        #params[new_param2] = max_constant
-                        #params[new_param] = {}
-                        params[str(rule.group('rulename'))+"_upperBound"] = max_constant
-                        counter = 0
-                        tmp_productions_to_extend = [0]*len(possible_values)
-                        for i in possible_values:
-                            # add a terminal symbol
-                            i = round(i,4)
-                            i = str(max_constant) +"_"+ str(i)
-                            #params[new_param][str(i)] = counter
-                            counter += 1
-                            tmp_production, terminalparts = [], None
-                            symbol = {
-                                "symbol": str(i),
-                                "type": "T",
-                                "min_steps": 0,
-                                "recursive": False}
-                            tmp_production.append(symbol)
-                            if str(i) not in self.terminals:
-                                self.terminals[str(i)] = [rule.group('rulename')]
-                            elif rule.group('rulename') not in self.terminals[str(i)]:
-                                self.terminals[str(i)].append(rule.group('rulename'))
-                            tmp_productions.append({"choice": tmp_production,
-                                                    "recursive": False,
-                                                    "NT_kids": False})
-                        if len(possible_values) > params['CODON_SIZE']:
-                            params['CODON_SIZE'] = len(possible_values)
-                        
-                        continue
-                    """
-
                     # special cases: GE_RANGE:dataset_n_vars will be
                     # transformed to productions 0 | 1 | ... |
                     # n_vars-1, and similar for dataset_n_is,

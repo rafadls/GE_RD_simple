@@ -106,7 +106,7 @@ def get_data():
     data = pd.read_csv(path + 'df_' + str(params['N_CELDAS']) + '_ff.txt')
   elif params['COEFICIENTE']==3:
     data = pd.read_csv(path + 'df_' + str(params['N_CELDAS']) + '_n.txt')
-  data = data.sample(n=params['N_ROWS_TRAIN'])
+  #data = data.sample(n=params['N_ROWS_TRAIN'])
   return data.iloc[:,:-1], data.iloc[:,-1].values
 
 def get_all_data():
@@ -243,6 +243,7 @@ def compare(input, dataset_array, individuals_array, path_to_folder):
   fig, axis = plt.subplots(n_individuals, 3, figsize=(25,n_individuals*7))
   fig.suptitle('Comparación de individuos en cuanto a: ' + input ,fontsize=30)
   output_array = ['V', 'P', 'TC']
+  lim_dict = {}
   for i in range(len(dataset_array)):
     for j in range(len(output_array)):
       df_i_vs_o = get_df_to_plot(dataset_array[i],input,output_array[j])
@@ -253,6 +254,12 @@ def compare(input, dataset_array, individuals_array, path_to_folder):
         axis[i,j].set_title(individuals_array[i],fontsize=25)
       axis[i,j].set_xlabel(input, fontsize=20)
       axis[i,j].set_ylabel(output_array[j],fontsize=20)
+      if i==0:
+        lim_dict[j] = axis[i,j].get_ylim()
+      else:
+        axis[i,j].set_ylim(lim_dict[j])
+
+
   plt.savefig(path_to_folder + input + '.png')
 
 #######################################################
@@ -264,19 +271,20 @@ def save_graph_data_outputs(df, num_celdas, path_to_save):
   fig, axes = plt.subplots(nrow, ncol,figsize=(15,nrow*8))
   fig.suptitle('Comparación de individuos para ' + str(num_celdas) + ' celdas',fontsize=30)
 
-  df_vf.plot(rot=0, ax=axes[0])
-  axes[0].set_title('Error en cálculo de velocidad de fluido para por columna',fontsize=25)
+  df_vf.plot(rot=0, ax=axes[0],style='o')
+  axes[0].set_title('Error en cálculo de velocidad',fontsize=25)
   axes[0].set_xlabel('Columnas',fontsize=20)
-  axes[0].set_ylabel('Error',fontsize=20)
+  axes[0].set_ylabel('Error [m²/s]',fontsize=20)
 
-  df_pf.plot(rot=0, ax=axes[1])
-  axes[1].set_title('Error en cálculo de presión de fluido para por columna',fontsize=25)
+  df_pf.plot(rot=0, ax=axes[1],style='o')
+  axes[1].set_title('Error en cálculo de presión',fontsize=25)
   axes[1].set_xlabel('Columnas',fontsize=20)
+  axes[1].set_ylabel('Error [Pa]',fontsize=20)
 
-  df_tc.plot(rot=0, ax=axes[2])
-  axes[2].set_title('Error en cálculo de temperatura de celda para por columna',fontsize=25)
+  df_tc.plot(rot=0, ax=axes[2],style='o')
+  axes[2].set_title('Error en cálculo de temperatura',fontsize=25)
   axes[2].set_xlabel('Columnas',fontsize=20)
-  axes[2].set_ylabel('Error',fontsize=20)
+  axes[2].set_ylabel('Error [°C]',fontsize=20)
 
   plt.savefig(path_to_save + 'individuals_comparation_' + str(num_celdas) + '_cells.png')
 

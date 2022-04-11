@@ -11,7 +11,9 @@ import matplotlib.pyplot as plt
 import math
 
 from algorithm.parameters import params
+from sklearn.metrics import explained_variance_score, max_error, mean_absolute_error, mean_squared_error, mean_squared_log_error, median_absolute_error, mean_absolute_percentage_error,r2_score,mean_poisson_deviance,mean_gamma_deviance, mean_tweedie_deviance, d2_tweedie_score, mean_pinball_loss 
 from fitness.funciones_fitness import eval_allData , eval_all_data_modeloFenomenologico, save_graph_data_outputs
+from fitness.funciones_fitness import get_data, get_data_to_curves, prepro
 from fitness.funciones_fitness import df_from_output, get_df_to_plot, get_dataFrame, get_data_simple, compare, eval_data
 from fitness.ModeloBaterias.funcionesEvaluar_ModeloJava import eval_allData_multicore
 from fitness.ModeloBaterias.fitness_modelo_java import fitness_modelo_java
@@ -20,9 +22,15 @@ from fitness.fitness_modelo import fitness_modelo
 # Se obtiene el path relativo
 mainPath = os.path.abspath("..")
 path_compare = mainPath + '/compare/'
-
+path_compare_direct = path_compare + 'direct/'
+path_compare_outputs = path_compare + 'outputs/'
+path_compare_curves = path_compare + 'curves/'
+path_compare_generalization = path_compare + 'generalization/'
 
 df = pd.read_csv(mainPath + '/datasets/Compare/individuals.csv')
+n_individuals = len(df)
+coeficientes_array = ['Coeficiente de arrastre', 'Factor de fricción','Número de Nusselt']
+coeficientes_array_short = ['cdrag', 'ffactor','nusselt']
 
 try:
     shutil.rmtree(path_compare)
@@ -30,19 +38,90 @@ except:
     pass
 try:
     os.makedirs(path_compare)
+    os.makedirs(path_compare_direct)
+    os.makedirs(path_compare_outputs)
+    os.makedirs(path_compare_generalization)
+    for intem in coeficientes_array_short:
+        os.makedirs(path_compare_curves + intem + '/')
 except:
     pass
 
-###### FITNESS COEFICIENTES ######
+print()
+###### ERROR COEFICIENTES POR COLUMNA ######
+print('ERROR COEFICIENTES POR COLUMNA')
 
-df = 
-exp = 
-eval_allData
+for j in range(len(coeficientes_array)):
+    print(coeficientes_array[j])
+    params['COEFICIENTE'] = j+1
+    params['N_CELDAS'] = 25
+    X, y = get_data_to_curves()
+    df_to_eval = prepro(X)
+    X['colIndex'] = X['colIndex'].astype(str)
+    X = X[['colIndex']]
+    for index, row in df.iterrows():
+        y_pred = eval_allData(row[coeficientes_array_short[j]].replace('^','**'), df_to_eval)
+        error = np.abs(y_pred - y)
+        X[row['Name']] = error
+    X = X.groupby('colIndex').mean()
+    X.plot(style='o')
+    plt.title('Error de ' + coeficientes_array[j] + ' por columna')
+    plt.ylabel('Error')
+    plt.xlabel('Columna')
+    plt.savefig(path_compare_direct + coeficientes_array_short[j] + '.png')
 
+print()
+###### CURVAS COEFICIENTES VS INPUTS ######
+print('CURVAS COEFICIENTES VS INPUTS')
 
+for j in range(len(coeficientes_array)):
+    print(coeficientes_array[j])
+    params['COEFICIENTE'] = j+1
+    params['N_CELDAS'] = 25
+    X, y = get_data_to_curves()
+    df_to_eval = prepro(X)
+    n_columnas = len(X['colIndex'].unique())
+    len_dataset = len(X)
+    # Calcular valores por individuo
+    X['ANSYS'] = y
+    for index, row in df.iterrows():
+        X[row['Name']] = eval_allData(row[coeficientes_array_short[j]].replace('^','**'), df_to_eval)
+    # Crear dataframe con resultados por columna
+    df_output = pd.DataFrame()
+    for i in range(len_dataset//n_columnas):
+        df_aux = X.iloc[i:i+n_columnas,:]
+        dictionary = dict(X.iloc[i,:-2])
+        for index, row in df_aux.iterrows():
+            dictionary['ANSYS_' + str(int(row['colIndex']))] = row['ANSYS']
+            for index_i, row_i in df.iterrows():
+                dictionary[row_i['Name'] + '_' + str(int(row['colIndex']))] = row[row_i['Name']]
+        df_output = df_output.append(dictionary, ignore_index=True)
+    df_output = df_output.dropna()
+    # numero de individuos
+    n_individuals = len(df)
+    # obtener comparacion
+    for input_model in ['Current','K','Flujo','t_viento','Diametro']:
+        fig, axis = plt.subplots(n_individuals + 1,1, figsize=(18,n_individuals*7))
+        fig.suptitle(coeficientes_array[j] + ' vs ' + input_model,fontsize=25)
+        df_curva = get_df_to_plot(df_output,input_model, 'ANSYS_').drop_duplicates(subset=input_model)
+        columns_to_plot = list(df_curva.columns)
+        columns_to_plot.remove(input_model)
+        df_curva.plot(x=input_model, y=columns_to_plot, ax=axis[0])
+        axis[0].set_title('ANSYS',fontsize=15)
+        axis[0].set_xlabel(input_model)
+        axis[0].set_ylabel(coeficientes_array[j])
+        for index_i, row_i in df.iterrows():
+            df_curva = get_df_to_plot(df_output,input_model,row_i['Name'] +'_').drop_duplicates(subset=input_model)
+            columns_to_plot = list(df_curva.columns)
+            columns_to_plot.remove(input_model)
+            df_curva.plot(x=input_model, y=columns_to_plot, ax=axis[index_i+1])
+            axis[index_i+1].set_title(row_i['Name'],fontsize=15)
+            axis[index_i+1].set_xlabel(input_model)
+            axis[index_i+1].set_ylabel(coeficientes_array[j])
+        plt.savefig(path_compare_curves + coeficientes_array_short[j] + '/' + input_model + '.png')
 
-
-#print('FITNESS COEFICIENTES')
+print()
+###### GENERALIZACIÓN ######
+print('GENERALIZACIÓN')
 
 nrow=3
 ncol=1
@@ -54,11 +133,11 @@ df_n= pd.DataFrame()
 for index, row in df.iterrows():
     name = row['Name']
     fitness_function = fitness_modelo()
-    fitness_25, fitness_53, fitness_74, fitness_102 = eval_data(fitness_function,row['cdrag'],1)
+    fitness_25, fitness_53, fitness_74, fitness_102 = eval_data(fitness_function,row['cdrag'].replace('^','**'),1)
     df_cdrag=df_cdrag.append({'fitness 25 celdas': fitness_25,'fitness 53 celdas': fitness_53,'fitness 74 celdas': fitness_74,'fitness 102 celdas': fitness_102},ignore_index=True)
-    fitness_25, fitness_53, fitness_74, fitness_102 = eval_data(fitness_function,row['ffactor'],2)
+    fitness_25, fitness_53, fitness_74, fitness_102 = eval_data(fitness_function,row['ffactor'].replace('^','**'),2)
     df_ff=df_ff.append({'fitness 25 celdas': fitness_25,'fitness 53 celdas': fitness_53,'fitness 74 celdas': fitness_74,'fitness 102 celdas': fitness_102},ignore_index=True)
-    fitness_25, fitness_53, fitness_74, fitness_102 = eval_data(fitness_function,row['nusselt'],3)
+    fitness_25, fitness_53, fitness_74, fitness_102 = eval_data(fitness_function,row['nusselt'].replace('^','**'),3)
     df_n=df_n.append({'fitness 25 celdas': fitness_25,'fitness 53 celdas': fitness_53,'fitness 74 celdas': fitness_74,'fitness 102 celdas': fitness_102},ignore_index=True)
     #print(eval_all_data_modeloFenomenologico(phtnotype))
 df_cdrag.index = df['Name']
@@ -86,10 +165,15 @@ axes[2].set_title('Número de Nusselt',fontsize=15)
 axes[2].set_xlabel('Individuals')
 axes[2].set_ylabel('Fitness')
 
-plt.savefig(path_compare + 'coeficientes.png')
+plt.savefig(path_compare_generalization + 'coeficientes.png')
 
-###### FITNESS SALIDAS ######
-print('FITNESS SALIDAS')
+print()
+
+
+###### ERROR SALIDAS ######
+print('ERROR SALIDAS')
+
+
 df_25 = pd.DataFrame()
 df_53 = pd.DataFrame()
 df_74 = pd.DataFrame()
@@ -111,10 +195,12 @@ for index, row in df.iterrows():
         dfs[i][name + '_TC'] = fitness_array[i][2,:]
 
 for i in range(len(dfs)):
-    save_graph_data_outputs(dfs[i], ns_celdas[i], path_compare)
+    save_graph_data_outputs(dfs[i], ns_celdas[i], path_compare_outputs)
 
+print()
 ######### CURVAS ###########
 print('CURVAS')
+
 dataset_output_array = []
 individuals_array = []
 
@@ -141,5 +227,6 @@ for index, row in df.iterrows():
         print(e)
 
 for column in ['Current', 'K', 'Flujo', 't_viento', 'Diametro']:
-    compare(column, dataset_output_array, individuals_array, path_compare)
+    compare(column, dataset_output_array, individuals_array, path_compare_curves)
 
+print()

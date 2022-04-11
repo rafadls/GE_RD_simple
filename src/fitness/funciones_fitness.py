@@ -109,6 +109,17 @@ def get_data():
   #data = data.sample(n=params['N_ROWS_TRAIN'])
   return data.iloc[:,:-1], data.iloc[:,-1].values
 
+def get_data_to_curves():
+  path = '../datasets/ModeloBaterias_pre/'
+  if params['COEFICIENTE']==1:
+    data = pd.read_csv(path + 'df_' + str(params['N_CELDAS']) + '_cdrag.txt')
+  elif params['COEFICIENTE']==2:
+    data = pd.read_csv(path + 'df_' + str(params['N_CELDAS']) + '_ff.txt')
+  elif params['COEFICIENTE']==3:
+    data = pd.read_csv(path + 'df_' + str(params['N_CELDAS']) + '_n.txt')
+  #data = data.sample(n=params['N_ROWS_TRAIN'])
+  return data.iloc[:,:-1], data.iloc[:,-1].values
+
 def get_all_data():
     path = '../datasets/ModeloBaterias/'
     if params['COEFICIENTE']==1:
@@ -185,6 +196,37 @@ def get_data_outputs(df):
     df_outputs.append(df_output)
   return df_outputs
 
+
+######################## PREPRO #######################
+
+def prepro_cdrag(df_cdrag):
+  df_cdrag = df_cdrag[['K','col_fluido', 'normalizedArea','Rem','dfn_calc','colIndex']]
+  df_cdrag = df_cdrag.rename(columns={'K':'S','col_fluido':'fluidColumn', 'normalizedArea':'An','Rem':'Rem','dfn_calc':'Dfn','colIndex':'colIndex'})
+  df_cdrag['fluidColumn'] = pd.to_numeric(df_cdrag['fluidColumn'])
+  df_cdrag['colIndex'] = pd.to_numeric(df_cdrag['colIndex'])
+  return df_cdrag
+
+def prepro_ff(df_ff):
+  df_ff = df_ff[['K', 'vmfn','Rem','dfn_calc','colIndex']]
+  df_ff = df_ff.rename(columns={'K':'S','vmfn':'Vmfn','Rem':'Rem','dfn_calc':'Dfn','colIndex':'colIndex'})
+  df_ff['colIndex'] = pd.to_numeric(df_ff['colIndex'])
+  return df_ff
+
+def prepro_n(df_n):
+  df_n = df_n[['K','Rem','prandtl','colIndex']]
+  df_n = df_n.rename(columns={'K':'S','Rem':'Rem','prandtl':'Prandtl','colIndex':'colIndex'})
+  df_n['colIndex'] = pd.to_numeric(df_n['colIndex'])
+  return df_n
+
+def prepro(df):
+  if params['COEFICIENTE']==1:
+    return prepro_cdrag(df)
+  elif params['COEFICIENTE']==2:
+    return prepro_ff(df)
+  elif params['COEFICIENTE']==3:
+    return prepro_n(df)
+
+
 ######################## CURVAS #######################
 
 def df_from_output(numpy_array):
@@ -202,7 +244,7 @@ def df_from_output(numpy_array):
   return df_salidas
 
 def get_df_to_plot(df,var1,var2):
-  col_inputs = ['Current', 'K', 'Flujo', 't_viento', 'Diametro']
+  col_inputs = ['Current','K','Flujo','t_viento','Diametro']
   df_aux = pd.concat([df[col_inputs],df.filter(regex=(var2 + "+\d")) ],axis=1)
   col_inputs.remove(var1)
   dir_base_values = dict(df.groupby(by=col_inputs).size().reset_index().rename(columns={0:'records'}).sort_values(by=['records'],ascending=False).reset_index(drop=True).iloc[0,:])

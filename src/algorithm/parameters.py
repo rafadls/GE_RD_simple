@@ -28,6 +28,7 @@ params = {
     'RUNS': 1,
 
     # Class of problem
+    #'FITNESS_FUNCTION': "fitness_modelo",
     'FITNESS_FUNCTION': "fitness_modelo",
 
     # Optimización
@@ -348,7 +349,7 @@ def set_params(command_line_args, create_files=True):
         elif params['COEFICIENTE'] == 3:
             print("Entrenar: número de Nusselt")
             params['DATASET_TRAIN'] = "../datasets/ModeloBaterias/df_n.txt"
-            params['GRAMMAR_FILE'] = "../grammars/ModeloBaterias/nusselt_max2_index.bnf"
+            params['GRAMMAR_FILE'] = "../grammars/ModeloBaterias/nusselt.bnf"
 
         # Initialise run lists and folders before we set imports.r
         initialise_run_params(create_files)

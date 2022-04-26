@@ -30,8 +30,8 @@ class fitness_modelo_java(base_ff):
         self.training_in, self.training_exp, self.test_in, self.test_exp = [1, 1, 1, 1]
         #self.maximise = params['ERROR_METRIC'].maximise 
 
-        self.data_in  = pd.read_csv("../datasets/ModeloFenomenologicoBaterias/" + str(params["num_celdas"]) +"_in.txt", sep=' ')
-        self.data_out = pd.read_csv("../datasets/ModeloFenomenologicoBaterias/" + str(params["num_celdas"]) +"_out.txt", sep=' ')
+        self.data_in  = pd.read_csv("../datasets/ModeloFenomenologicoBaterias/" + str(params['N_CELDAS']) +"_in.txt", sep=' ')
+        self.data_out = pd.read_csv("../datasets/ModeloFenomenologicoBaterias/" + str(params['N_CELDAS']) +"_out.txt", sep=' ')
         self.target = create_array_result(self.data_out)
         
         self.n_vars = params["CODON_SIZE"]
@@ -54,7 +54,7 @@ class fitness_modelo_java(base_ff):
         try:
             optimize = kwargs['optimization']
             if optimize:
-                custom_optimize_constants2(self.data_in, self.target, ind, actualizeGenome=True)    
+                custom_optimize_constants2(ind, actualizeGenome=True)    
             else:
                 zipped = get_consts(ind.phenotype)
                 if len(zipped) != 0:
@@ -72,12 +72,9 @@ class fitness_modelo_java(base_ff):
             return [math.nan, [math.nan, math.nan, math.nan]]
 
 
-    def fitness_stringPhenotype(self, phenotype):
-        final_trees = deepcopy(phenotype.split(";"))
+    def fitness_stringPhenotype(self, final_trees):
         try: 
             modelResult = eval_allData_multicore(self.data_in, final_trees)
-            with open('/home/rafael/Tesis/test.npy', 'wb') as f:
-                np.save(f, modelResult)
             result_is_invalid = check_invalid_result(modelResult)
             if result_is_invalid:
                 fitness_calculado = math.inf

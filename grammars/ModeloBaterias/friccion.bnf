@@ -1,84 +1,13 @@
-<start>     ::= (<factorS>)<factorSS>   |
-                (<factorS>)+(<factorS>) |
-                (<factorS>)/(<factorS>) |
-                (<factorS>)*(<factorS>) |
-                (<factorS>)^(<factorS>)
-                
+<start> ::= <expr1>
+<expr1> ::= ((<expr2>)<op>(<expr2>)) | (<expr2>)
+<expr2> ::= ((<expr3>)<op>(<expr3>)) | (<expr3>)
+<expr3> ::= ((<expr4>)<op>(<expr4>)) | (<expr4>)
+<expr4> ::= ((<var>)<op>(<var>)) | (<var>)
+<op> ::=  + | - | * | ** | / 
+<var> ::= S|Vmfn|Rem|Dfn|colIndex|c[<num>]
+<num> ::= <-1,1>|<-10,10>|<-100,100>|<-1000,1000>
 
-<factorSS>  ::= <fS><fS><fS><fS>
-<factorS>   ::= ((<factor> + 0<fS>)     / (1<fS><fS>))              |
-                ((<factor> + <factor>)  / (1<fS><fS>))              |
-                ((<factor> + 0<fS>)     / (<factor> + <factor>))    |
-                ((<factor> + <factor>)  / (<factor> + 0<fS>))       |
-                ((<factor> + <factor>)  / (<factor> + <factor>))
-
-
-<fS>        ::= <f><f>
-<factor>    ::= (<factor0>)<f> |
-                (<factor1>)<f> | (<factor0>)*(<factor1>)       |
-                (<factor2>)<f> | (<factor0>)*(<factor2>)       |
-                (<factor3>)<f> | (<factor0>)*(<factor3>)       |
-                (<factor4>)<f> | (<factor0>)*(<factor4>)       |
-                (<factor5>)<f> | (<factor0>)*(<factor5>)       
-
-
-<f>         ::= <&2><&2><&2><&2><&2>
-
-<factor0>   ::= c[<-5,5>]<&1> <&2><&2><&2><&2>
-
-<factor1>   ::= <Rem> <&2><&2><&2><&2>          |
-                <Dfn> <&2><&2><&2><&2>          |
-                <Vmfn> <&2><&2><&2><&2>         |
-                <S> <&2><&2><&2><&2>            |
-                <colIndex> <&2><&2><&2><&2> 
-
-<factor2>   ::= <Rem>*<Dfn> <&2><&2><&2>            |
-                <Rem>*<Vmfn> <&2><&2><&2>           | 
-                <Rem>*<S> <&2><&2><&2>              | 
-                <Rem>*<colIndex> <&2><&2><&2>       | 
-                <Dfn>*<Vmfn> <&2><&2><&2>           | 
-                <Dfn>*<S> <&2><&2><&2>              | 
-                <Dfn>*<colIndex> <&2><&2><&2>       | 
-                <Vmfn>*<S> <&2><&2><&2>             | 
-                <Vmfn>*<colIndex> <&2><&2><&2>      | 
-                <S>*<colIndex> <&2><&2><&2> 
-
-<factor3>   ::= <Rem>*<Dfn>*<Vmfn> <&2><&2>             |
-                <Rem>*<Dfn>*<S> <&2><&2>                |
-                <Rem>*<Dfn>*<colIndex> <&2><&2>         |
-                <Rem>*<Vmfn>*<S> <&2><&2>               |
-                <Rem>*<Vmfn>*<colIndex> <&2><&2>        |
-                <Rem>*<S>*<colIndex> <&2><&2>           |
-                <Dfn>*<Vmfn>*<S> <&2><&2>               |
-                <Dfn>*<Vmfn>*<colIndex> <&2><&2>        |
-                <Dfn>*<S>*<colIndex> <&2><&2>           |
-                <Vmfn>*<S>*<colIndex> <&2><&2>  
-
-<factor4>   ::= <Rem>*<Dfn>*<Vmfn>*<S> <&2>                  |
-                <Rem>*<Dfn>*<Vmfn>*<colIndex> <&2>           |
-                <Rem>*<Dfn>*<S>*<colIndex> <&2>              |
-                <Rem>*<Vmfn>*<S>*<colIndex> <&2>             |
-                <Dfn>*<Vmfn>*<S>*<colIndex> <&2> 
-
-<factor5>   ::= <Rem>*<Dfn>*<Vmfn>*<S>*<colIndex>   
-
-
-
-
-<&2>        ::= <&1>
-<Rem>       ::= Rem <&1>        | Rem^c[<-5,5>]           |
-<Dfn>       ::= Dfn <&1>        | Dfn^c[<-5,5>]           |
-<Vmfn>      ::= Vmfn <&1>       | Vmfn^c[<-5,5>]          |
-<S>         ::= S <&1>          | S^c[<-5,5>]             |
-<colIndex>  ::= colIndex <&1>   | colIndex^c[<-5,5>]
-
-
-<&1>        ::= &
-<-2,2>      ::= GE_constants:-2_0.01_2
-<-5,5>      ::= GE_constants:-5_0.1_5
-<-10,10>    ::= GE_constants:-10_0.1_10
-<-100,100>  ::= GE_constants:-100_0.1_100
-<0,2>       ::= GE_constants:0_0.1_2
-<0,3>       ::= GE_constants:0_0.1_3
-<80,1000>   ::= GE_constants:80_1_1000
-<-3,-1>     ::= GE_constants:-3_0.1_-1
+<-1,1>      ::= GE_constants:-1_0.001_1
+<-10,10>    ::= GE_constants:-10_0.001_10
+<-100,100>  ::= GE_constants:-100_0.01_100
+<-1000,1000>  ::= GE_constants:-1000_1_1000

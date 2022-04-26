@@ -124,7 +124,7 @@ def get_data_correlation():
   df_n = pd.read_csv(path + 'df_n.csv')
   return df_cdrag, df_ff, df_n
 
-def get_matrix_error(modelResult, target, type="abs_dif"):
+def get_matrix_error(modelResult, target, type="relative"):
     if type == "relative":
         return list(np.abs((np.array(modelResult) - np.array(target))/np.array(target)))
     elif type == "abs_dif":
@@ -155,6 +155,8 @@ def fit_to_cells(matrix_error):
       print('matiz de error tiene nulos')
     #print(matrix_error_np.shape)
     matrix_error_celdas = matrix_error_np.mean(axis=0)
+    matrix_error_celdas = matrix_error_celdas**2
+    matrix_error_celdas = math.sqrt(np.sum(matrix_error_celdas))
     #print(matrix_error_celdas)
     return matrix_error_celdas
 

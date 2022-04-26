@@ -1,0 +1,2 @@
+cdrag,ffactor,nusselt
+1.8 * Rem ^ (- 1/(S^(0.7)*14.2*(  1 + 17792.241588911824 * An * Dfn * S ^ (9) * colIndex )) ) ,(Vmfn^S*Dfn^2)/(Vmfn*S) + Vmfn^(-0.704)+(0.411)/(Rem*Dfn),(((19.8 )/(colIndex^(1.5) + 88.6)))*(Rem^(0.7253))*(Prandtl^(1.3631))

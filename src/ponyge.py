@@ -148,59 +148,7 @@ def correrParametrosVarios(configurations):
     ax3.set_title('Duplicateds per generation',fontsize=15)
     plt.savefig(mainPath + '/Experiments/evolution.png')
 
-    ###################   Performance   #####################
 
-    fig = plt.figure(figsize=(15,15))
-    fig.suptitle('Performance',fontsize=25) 
-    #########
-    ax1 = plt.subplot(2,1,1) # fig.add_axes([0,0.3,1,0.3])
-    df_fitness.plot(ax=ax1)
-    ax1.set_ylabel('Fitness')
-    ax1.set_xlabel('Generations')
-    ax1.set_title('Fitness',fontsize=15)
-    ########
-    ax2 = plt.subplot(2,1,2) #fig.add_axes([0,1,1,0.6]) # [left, bottom, width, height]  
-    x = df[['Best fitness']].values
-    y = df[['Total time']].values
-    ax2.scatter(x,y)
-    ax2.set_yscale('log')
-    ax2.set_xscale('log')
-    for index, row in df.iterrows():
-        text = ''
-        for column in columns_text:
-            text = text + '(' + column + ':' + str(row[column]) + ') '
-        ax2.annotate(text, (row['Best fitness'], row['Total time']))  
-    ax2.set_ylabel('Total time')
-    ax2.set_xlabel('Best fitness')
-    ax2.set_title('Performance',fontsize=15)
-
-    for index, row in df.iterrows():
-        text = ''
-        for column in columns_text:
-            text = text + '(' + column + ':' + str(row[column]) + ') '
-        ax2.annotate(text, (row['Best fitness'], row['Total time']))    
-
-    ### Save multi plot
-    plt.savefig(mainPath + '/Experiments/performance.png')
-
-    ########################## Generalization ########################    
-    nrow=len(df)
-    ncol=1
-    fig, axes = plt.subplots(nrow, ncol, figsize=(20,nrow*5))
-    fig.suptitle('Generalization per configuration',fontsize=25)
-    fitness_function = fitness_modelo()
-    for index, row in df.iterrows():
-        text = ''
-        for column in columns_text:
-            text = text + '(' + column + ':' + str(row[column]) + ') '
-        print(text)
-        fitness_25_array, fitness_53_array, fitness_74_array, fitness_102_array = eval_all_data(fitness_function, df_phenotype[text], row['COEFICIENTE'])
-        df_generalization = pd.DataFrame({'fitness 25 celdas': fitness_25_array,'fitness 53 celdas': fitness_53_array,'fitness 74 celdas': fitness_74_array,'fitness 102 celdas': fitness_102_array})
-        df_generalization.plot(ax=axes[index])
-        axes[index].set_xlabel('Generations')
-        axes[index].set_ylabel('Fitness')
-        axes[index].set_yscale('log')
-    plt.savefig(mainPath + '/Experiments/generalization.png')
 
 def mane():
     """ Run program """

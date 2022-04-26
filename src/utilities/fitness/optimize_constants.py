@@ -14,7 +14,7 @@ import operator
 from copy import deepcopy
 
 
-def custom_optimize_constants2(x, y, ind, actualizeGenome=False):
+def custom_optimize_constants2(ind, actualizeGenome=False):
     s, n_ctes, acc_values_int, lower_values_float, step_values_float, last_values_float, init = make_consts_consecutive(ind.phenotype_original, returnInit=True)
     ind.phenotype_consec_consts = s
     new_phenotype = s

@@ -21,72 +21,11 @@ from fitness.fitness_modelo import fitness_modelo
 
 # Se obtiene el path relativo
 mainPath = os.path.abspath("..")
-path_compare = mainPath + '/compare/'
-path_compare_direct = path_compare + 'direct/'
-path_compare_outputs = path_compare + 'outputs/'
-path_compare_curves = path_compare + 'curves/'
-path_compare_generalization = path_compare + 'generalization/'
 
 df = pd.read_csv(mainPath + '/datasets/Compare/individuals.csv')
 n_individuals = len(df)
 coeficientes_array = ['Coeficiente de arrastre', 'Factor de fricción','Número de Nusselt']
 coeficientes_array_short = ['cdrag', 'ffactor','nusselt']
-
-try:
-    shutil.rmtree(path_compare)
-except:
-    pass
-try:
-    os.makedirs(path_compare)
-    os.makedirs(path_compare_direct)
-    os.makedirs(path_compare_outputs)
-    os.makedirs(path_compare_generalization)
-    for intem in coeficientes_array_short:
-        os.makedirs(path_compare_curves + intem + '/')
-except:
-    pass
-
-print()
-###### ERROR COEFICIENTES POR COLUMNA ######
-print('ERROR COEFICIENTES POR COLUMNA')
-
-for j in range(len(coeficientes_array)):
-    print(coeficientes_array[j])
-    params['COEFICIENTE'] = j+1
-    params['N_CELDAS'] = 102
-    X, y = get_data_to_curves()
-    df_to_eval = prepro(X)
-    X['colIndex'] = X['colIndex']
-    X = X[['colIndex']]
-    for index, row in df.iterrows():
-        y_pred = eval_allData(row[coeficientes_array_short[j]].replace('^','**'), df_to_eval)
-        error = np.abs(y_pred - y)
-        X[row['Name']] = error
-    X = X.groupby('colIndex').mean()
-    X.plot(style='o')
-    plt.title('Error de ' + coeficientes_array[j] + ' por columna')
-    plt.ylabel('Error')
-    plt.xlabel('Columna')
-    plt.savefig(path_compare_direct + coeficientes_array_short[j] + '.png')
-
-for j in range(len(coeficientes_array)):
-    print(coeficientes_array[j])
-    params['COEFICIENTE'] = j+1
-    params['N_CELDAS'] = 102
-    X, y = get_data_to_curves()
-    df_to_eval = prepro(X)
-    X['colIndex'] = X['colIndex']
-    X = X[['colIndex']]
-    for index, row in df.iterrows():
-        y_pred = eval_allData(row[coeficientes_array_short[j]].replace('^','**'), df_to_eval)
-        error = mean_absolute_percentage_error(y_pred,y)
-        X[row['Name']] = error
-    X = X.groupby('colIndex').mean()
-    X.plot(style='o')
-    plt.title('Error de ' + coeficientes_array[j] + ' por columna')
-    plt.ylabel('Error')
-    plt.xlabel('Columna')
-    plt.savefig(path_compare_direct + coeficientes_array_short[j] + '_p' + '.png')
 
 
 print()
@@ -125,7 +64,7 @@ for j in range(len(coeficientes_array)):
         df_curva = get_df_to_plot(df_output,input_model, 'ANSYS_').drop_duplicates(subset=input_model)
         columns_to_plot = list(df_curva.columns)
         columns_to_plot.remove(input_model)
-        df_curva.plot(x=input_model, y=columns_to_plot, ax=axis[0], style='o')
+        df_curva.plot(x=input_model, y=columns_to_plot, ax=axis[0])
         axis[0].set_title('ANSYS',fontsize=15)
         axis[0].set_xlabel(input_model)
         axis[0].set_ylabel(coeficientes_array[j])
@@ -139,60 +78,9 @@ for j in range(len(coeficientes_array)):
             axis[index_i+1].set_ylabel(coeficientes_array[j])
         plt.savefig(path_compare_curves + coeficientes_array_short[j] + '/' + input_model + '.png')
 
-print()
-###### GENERALIZACIÓN ######
-print('GENERALIZACIÓN')
-
-nrow=3
-ncol=1
-fig, axes = plt.subplots(nrow, ncol, figsize=(15,15))
-fig.suptitle('Comparación de individuos',fontsize=25)
-df_cdrag = pd.DataFrame()
-df_ff = pd.DataFrame()
-df_n= pd.DataFrame()
-for index, row in df.iterrows():
-    name = row['Name']
-    fitness_function = fitness_modelo()
-    fitness_25, fitness_53, fitness_74, fitness_102 = eval_data(fitness_function,row['cdrag'].replace('^','**'),1)
-    df_cdrag=df_cdrag.append({'fitness 25 celdas': fitness_25,'fitness 53 celdas': fitness_53,'fitness 74 celdas': fitness_74,'fitness 102 celdas': fitness_102},ignore_index=True)
-    fitness_25, fitness_53, fitness_74, fitness_102 = eval_data(fitness_function,row['ffactor'].replace('^','**'),2)
-    df_ff=df_ff.append({'fitness 25 celdas': fitness_25,'fitness 53 celdas': fitness_53,'fitness 74 celdas': fitness_74,'fitness 102 celdas': fitness_102},ignore_index=True)
-    fitness_25, fitness_53, fitness_74, fitness_102 = eval_data(fitness_function,row['nusselt'].replace('^','**'),3)
-    df_n=df_n.append({'fitness 25 celdas': fitness_25,'fitness 53 celdas': fitness_53,'fitness 74 celdas': fitness_74,'fitness 102 celdas': fitness_102},ignore_index=True)
-    #print(eval_all_data_modeloFenomenologico(phtnotype))
-df_cdrag.index = df['Name']
-df_ff.index = df['Name']
-df_n.index = df['Name']
-
-df_cdrag = df_cdrag[['fitness 25 celdas','fitness 53 celdas','fitness 74 celdas','fitness 102 celdas']]
-df_ff = df_ff[['fitness 25 celdas','fitness 53 celdas','fitness 74 celdas','fitness 102 celdas']]
-df_n = df_n[['fitness 25 celdas','fitness 53 celdas','fitness 74 celdas','fitness 102 celdas']]
-
-df_cdrag.plot.bar(rot=0, ax=axes[0])
-axes[0].set_title('Coeficiente de arrastre',fontsize=15)
-axes[0].set_xlabel('Individuals')
-axes[0].set_ylabel('Fitness')
-
-
-df_ff.plot.bar(rot=0, ax=axes[1])
-axes[1].set_title('Factor de fricción',fontsize=15)
-axes[1].set_xlabel('Individuals')
-axes[1].set_ylabel('Fitness')
-
-
-df_n.plot.bar(rot=0, ax=axes[2])
-axes[2].set_title('Número de Nusselt',fontsize=15)
-axes[2].set_xlabel('Individuals')
-axes[2].set_ylabel('Fitness')
-
-plt.savefig(path_compare_generalization + 'coeficientes.png')
-
-print()
-
 
 ###### ERROR SALIDAS ######
 print('ERROR SALIDAS')
-
 
 df_25 = pd.DataFrame()
 df_53 = pd.DataFrame()

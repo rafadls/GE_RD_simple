@@ -1,13 +1,13 @@
 {
 "variableParams": 
     {
-    "COEFICIENTE": [1,2,3], 
-    "POPULATION_SIZE": [1000],
-    "GENERATIONS": [500],
+    "COEFICIENTE": [1, 2, 3], 
+    "POPULATION_SIZE": [500],
+    "GENERATIONS": [200],
     "CROSSOVER_PROBABILITY": [0.75],
     "MUTATION_PROBABILITY": [0.05],
     "optimizeConstant_each":[50],
-    "MR": [false],
+    "MR": [true],
     "Correlation": [false],
     "check_minimum_fitness": [false], 
     "N_CELDAS": [102],

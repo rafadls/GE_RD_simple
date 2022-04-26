@@ -291,7 +291,7 @@ def compare(input, dataset_array, individuals_array, path_to_folder):
       df_i_vs_o = get_df_to_plot(dataset_array[i],input,output_array[j])
       columns_to_plot = list(df_i_vs_o.columns)
       columns_to_plot.remove(input)
-      df_i_vs_o.plot(x=input, y=columns_to_plot, ax=axis[i,j])
+      df_i_vs_o.plot(x=input, y=columns_to_plot, ax=axis[i,j], style='o')
       if j==1:
         axis[i,j].set_title(individuals_array[i],fontsize=25)
       axis[i,j].set_xlabel(input, fontsize=20)
